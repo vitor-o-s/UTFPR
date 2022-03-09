@@ -1,43 +1,10 @@
 # Sistemas Operacionais
 
-Este repositório contém um breve resumo, anotações e demais arquivos utilizados durante a disciplina de Sistemas Operacionais (realizado em 2022/1)
+Este repositório contém um breve resumo, anotações e demais arquivos utilizados durante a disciplina de Sistemas Operacionais (realizado em 2022/1). O README.md do projeto apresenta um resumo do livro ["Sistemas Operacionais: Conceitos e Mecanismos"](http://wiki.inf.ufpr.br/maziero/doku.php?id=socm:start) do Prof Carlos A. Maziero, além de notas de aulas do professor [Dalcimar](dalcimar.com) e professor [Bruno Ribas](https://www.brunoribas.com.br/index.html).
 
-## Introdução
+## Capítulo 1 - Conceitos básicos
 
-A definição do que é um S.O. pode variar, contudo podemos elencar alguma de suas funcionalidades básicas. Logo um S.O. é responsável por:
+O S.O. possui 2 objetivos básicos:
 
-* Gerenciar o compartilhamento de recurso entre entidades concorrentes;
-
-* Fornecer serviços comuns que tornam as aplicações mais fáceis de escrever;
-
-* E servir como interface entre programa de aplicações e o hardware.
-
-Áreas de resonsabilidade de um S.O.:
-
-* Processos (criar, destruir, gerenciar prioridade, mecanismos de comunicação e mecanismos de sincronização)
-
-* Memória (solicitar memória adicional, solicitar memória indiretamente, liberar memória, solicitar áreas de memórias para serem compartilhadas entre processos)
-
-* Dispositivos E/S (abrir dispositivo, ler dados, gravar dados, fechar ou liberar um dispositivo, fornecer acesso exclusivo)
-
-* Sistemas de arquivos (abrir, ler, gravar e fechar arquivos, ler e modificar metadados do arquivo)
-
-* Segurança (configurar politicas de acesso, procurar politicas, autenticação, (de)criptografar)
-
-* Redes (Estabelecer/fechar conexão, atenda conexões e envie/receba mensagens)
-
-* Interface com o usuário (Gráfica, linhas... normalmente não tão ligada ao kernel)
-
-* Outros funções especiais do dispositivo
-
-### Técnicas de organização
-
-#### Monolítico
-
-#### Camada
-
-#### MicroKernel
-
-## Subtema 2
-
-## Subtema 3
+* Abstração de Recursos - Abstrair - Torna app independentes do hardware/Simplifica manipulação do hardware/Facilita o uso por hardwares distintos;
+* Gerenciar Recursos - Definir políticas para gerenciar o uso dos recursos do hardware.
