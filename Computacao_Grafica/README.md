@@ -4,6 +4,12 @@ Este repositório contém um breve resumo, anotações e demais arquivos utiliza
 
 ## Introdução
 
+Def.: *Computação Gráfica* é um subárea da computação que estuda a sintetisação (criação) e manipulação de conteúdo visual.
+
+Normalmente a Computação Gráfica engloba a Visão COmputacional, Processamento de Imagens, RA/RV e mais. Podemos dar enfoque no CGI (Computer Graphic Imagery), jogos, simuladores, animações, modelos 3D, assets, computação de alto desempenho, digital twins e claro toda a matemática.
+
+## Arquitetura da placa de vídeo
+
 Começamos a disciplina entendendo um pouco sobre a arquitetura do computador, em especial o funcionamento da GPU. Podemos dizer que inicialmente uma das principais diferenças entre a GPU e a CPU é a quantidade de núcleos, onde a CPU normalmente possui 16/32... a GPU vem a ter +1000 normalmente.
 
 Diferenças de uso entre CPU (Central Processor Unit) e GPU (Graphic Unit Processor)
