@@ -30,6 +30,17 @@ Um macrocṕelula possui:
 
 As PALCEs (PAL CMOS ellectrically erasable/programmable device) funcionava como as GALS contudo possuiam este nome diferente.
 
-#### CPLDs
+#### CPLDs (Compĺex PLD)
+
+Um avanço de fato das GAL/PALCE, pois possuem:
+
+* Interface JTAG (Joint Test Action Group, comunica com algum micro ou pc);
+* Drivers modernos de I/O (retira a necessidade de chips conversores de padrão);
+* Grande número de pinos (diminui a necessidade de multiplexação de barramento); e
+* Baixo custo.
 
 #### FPGAs
+
+Podemos dizer que as FPGAs são uma super PLD (para problemas muitos complexos). Elas possuem uma matriz de blocos lógicos ao invés de uma coluna e tais blocas são menores, em maior numero e mais sofisticados.
+
+As FPGAs possuem blocos internos como o SRAM (Static Random Acess Memory), DSP (Digital Signal Processor) e o PPL (Phase Looked Loop)
