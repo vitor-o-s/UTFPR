@@ -1,4 +1,5 @@
 # Lógica Reconfigurável
+
 Este repositório contém um breve resumo, anotações e demais arquivos utilizados durante a disciplina de Lógica Reconfigurável (realizado em 2022/1).
 
 ## Introdução
