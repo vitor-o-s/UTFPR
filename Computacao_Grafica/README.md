@@ -39,4 +39,4 @@ Fazer um resumo de um artigo que utiliza CUDA explicando o objetivo e os resulta
 
 Artigo escolhido: [A Performance Comparison of CUDA and OpenCL](https://arxiv.org/abs/1005.2581)
 
-Atividade: [T1.txt](https://github.com/vitor-o-s/UTFPR/tree/main/Computacao_Grafica)
+Atividade: [Resumo_Aritog_APerformanceComparisonofCUDAandOpenCL.md](https://github.com/vitor-o-s/UTFPR/blob/main/Computacao_Grafica/resumo_artigo_APerformanceComparisonofCUDAandOpenCL.md)
