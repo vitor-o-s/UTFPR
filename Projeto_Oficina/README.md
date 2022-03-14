@@ -23,4 +23,12 @@
 * Amazon Web Services AWS IoT
 * Amazon Web Services AWS SDK
 
+## Cronograma
+
+| Tarefa | Data de entrega
+|:---:|:---:
+| Criar Arquitetura | 01/04
+| Programar Lambda | 08/04
+| Teste micro | 30/05
+
 ## Get Started
