@@ -8,6 +8,14 @@ esquerda, se a letra for menor que a raiz.
 3. Esse procedimento (verificar a raiz e inserir a direita ou a esquerda) deve ser realizado recursivamente.
 Ex: VITOR
 
+     V
+    /
+    I
+    \
+     T
+     /\
+     R O
+
 
 Atenção, um processo deve mostrar uma mensagem se idenficando (“proc-V”... “proc-I”)
 quando ele acaba de ser criado e quando ele está prestes a morrer
@@ -16,12 +24,13 @@ cada processo gerado deve imprimir o seu PID e o PPID você deve garantir que um
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int main(void){
 
-    pid_t pid;
+    pid_t pid, pid2;
     int status = 0;
 
     printf("proc-V, pid%d, ppid%d, acaba de ser criado\n", getpid(), getppid());
@@ -29,6 +38,47 @@ int main(void){
     pid = fork();
     
     if(pid == 0){
+        printf("proc-I, pid%d, ppid%d, acaba de ser criado\n", getpid(), getppid());
+
+        pid = fork();
+
+        if(pid == 0){
+
+            printf("proc-T, pid%d, ppid%d, acaba de ser criado\n", getpid(), getppid());
+
+            pid = fork();
+            //pid2 = fork();
+
+            if(pid == 0){
+                
+                printf("proc-O, pid%d, ppid%d, acaba de ser criado\n",getpid(), getppid());
+                printf("proc-O, pid %d, morreu\n",getpid());
+                exit(0);
+            }
+            else{
+                waitpid(pid, &status, 0);
+                pid = fork();
+
+                if(pid == 0){
+
+                printf("proc-R, pid%d, ppid%d, acaba de ser criado\n",getpid(), getppid());
+                printf("proc-R, pid %d, morreu\n",getpid());
+                exit(0);
+                }
+                else{
+                    waitpid(pid, &status, 0);
+                    printf("proc-T, pid %d, morreu\n",getpid());
+                    exit(0);
+
+                }
+            }
+
+        }
+        else{
+            waitpid(pid, &status, 0);
+            printf("proc-I, pid %d, morreu\n",getpid());
+            exit(0);
+        }
 
 
     }
