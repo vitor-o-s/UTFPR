@@ -34,3 +34,15 @@ Podemos definir as principais funcionalidades implementadas de um S.O. por:
 ### Histórico
 
 Resolvi omitir esta parte do resumo para mais informações buscar a seção 1.4 do livro citado no inicio.
+
+## Capítulo 2 - Estrutura de um SO
+
+## Capítulo 3 - Arquiteturas de SOs
+
+## Capítulo 4 - O conceito de tarefa
+
+## Capítulo 5 - Implementação de tarefas
+
+## Capítulo 6 - Escalonamento de tarefas
+
+## CApítulo 7 - Tópicos em gestão de tarefas
