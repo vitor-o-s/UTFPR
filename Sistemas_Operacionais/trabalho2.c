@@ -13,8 +13,10 @@ Ex: VITOR
     I
     \
      T
-     /\
-     R O
+     /
+     O
+     \
+     R
 
 
 Atenção, um processo deve mostrar uma mensagem se idenficando (“proc-V”... “proc-I”)
@@ -30,35 +32,26 @@ cada processo gerado deve imprimir o seu PID e o PPID você deve garantir que um
 
 int main(void){
 
-    pid_t pid, pid2;
+    pid_t pid;
     int status = 0;
 
     printf("proc-V, pid%d, ppid%d, acaba de ser criado\n", getpid(), getppid());
 
-    pid = fork();
-    
+    pid = fork();    
     if(pid == 0){
         printf("proc-I, pid%d, ppid%d, acaba de ser criado\n", getpid(), getppid());
 
         pid = fork();
-
         if(pid == 0){
 
             printf("proc-T, pid%d, ppid%d, acaba de ser criado\n", getpid(), getppid());
 
             pid = fork();
-            //pid2 = fork();
-
             if(pid == 0){
                 
                 printf("proc-O, pid%d, ppid%d, acaba de ser criado\n",getpid(), getppid());
-                printf("proc-O, pid %d, morreu\n",getpid());
-                exit(0);
-            }
-            else{
-                waitpid(pid, &status, 0);
-                pid = fork();
 
+                pid = fork();
                 if(pid == 0){
 
                 printf("proc-R, pid%d, ppid%d, acaba de ser criado\n",getpid(), getppid());
@@ -67,20 +60,22 @@ int main(void){
                 }
                 else{
                     waitpid(pid, &status, 0);
-                    printf("proc-T, pid %d, morreu\n",getpid());
+                    printf("proc-O, pid %d, morreu\n",getpid());
                     exit(0);
-
                 }
             }
-
+            else{
+                waitpid(pid, &status, 0);
+                printf("proc-T, pid %d, morreu\n",getpid());
+                exit(0);
+                
+            }
         }
         else{
             waitpid(pid, &status, 0);
             printf("proc-I, pid %d, morreu\n",getpid());
             exit(0);
         }
-
-
     }
     else{
         waitpid(pid, &status, 0);
