@@ -31,13 +31,12 @@ long result = 0;
 void* calcula_pi(void* i){
 
     long tid = (long)i;
-    //int i;
     int termos = N_TERMOS_SERIE/N_THREADS;
     int inicio = tid*termos;
     int fim = tid*termos + termos;
 
 	for(int i = inicio; i < fim; i++)
-        parc[8*tid] += 4.0 / (1.0 + 1*1);
+        parc[8*tid] += pow(-1,i) / (2*i+1);
 }
 
 int main(void){
