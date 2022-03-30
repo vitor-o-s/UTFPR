@@ -28,11 +28,12 @@ parciais obdos por elas e apresenta o resultado final na tela;
 
 double parc[8*N_THREADS];
 double result = 0.0;
+int j=1;
 
 void* calcula_pi(void* i){
 
     long tid = (long)i;
-    int termos = N_TERMOS_SERIE/N_THREADS;
+    int termos = N_TERMOS_SERIE/(N_THREADS*j);
     int inicio = tid*termos;
     int fim = tid*termos + termos;
 
@@ -49,27 +50,28 @@ int main(void){
     int i;
     FILE *out = fopen("out.txt","w+");
 
-    for(i = 0; i < N_THREADS; i++) 
+    for(j=1; j<=N_THREADS; j=j*2){
+        result = 0.0;
+        for(i = 0; i < N_THREADS; i++) 
         parc[8*i] = 0;
     
-    struct timespec t1, t2;
+        struct timespec t1, t2;
 
-    clock_gettime(CLOCK_MONOTONIC, &t1);
-    for(i = 0; i < N_THREADS; i++)
-        pthread_create(&threads[i], NULL, calcula_pi, (void*)(intptr_t)i);
-    
-    for(i = 0; i < N_THREADS; i ++){
-
-        pthread_join(threads[i], NULL);
-        result += parc[8*i];
+        clock_gettime(CLOCK_MONOTONIC, &t1);
+        for(i = 0; i < N_THREADS; i++)
+            pthread_create(&threads[i], NULL, calcula_pi, (void*)(intptr_t)i);
         
+        for(i = 0; i < N_THREADS; i ++){
+
+            pthread_join(threads[i], NULL);
+            result += parc[8*i];
+            
+        }
+        clock_gettime(CLOCK_MONOTONIC, &t2);
+        double temp = (double)(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/1E9;
+        printf("N threads: %d\tValor de pi: %.50lf\tTempo: %.3f\n", j, (double)result, temp);
+        fprintf(out,"%d %.4f\n",j,temp);
     }
-    
-    //result += result*4;
-    clock_gettime(CLOCK_MONOTONIC, &t2);
-    double temp = (double)(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/1E9;
-    printf("Valor de pi: %.50lf\n",(double)result);
-    fprintf(out,"\n%d %.4f\n",N_THREADS,temp);
     fclose(out);
     //return 0;
 }
