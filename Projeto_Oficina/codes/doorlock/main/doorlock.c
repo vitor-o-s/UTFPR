@@ -18,7 +18,7 @@ void app_main(void)
     char *ourTaskName = pcTaskGetName(NULL);
 
     ESP_LOGI(ourTaskName, "Hello, stating up!\n");
-    gpio_Reset_pin(BLINK_LED);
+    gpio_reset_pin(BLINK_LED);
     gpio_set_direction(BLINK_LED, GPIO_MODE_OUTPUT);
 
     while (1)
