@@ -21,12 +21,13 @@ parciais obdos por elas e apresenta o resultado final na tela;
 #include<unistd.h>
 #include<math.h>
 #include<pthread.h>
+#include<time.h>
 
-#define N_THREADS 1
+#define N_THREADS 16
 #define N_TERMOS_SERIE 1000000000
 
-long parc[8*N_THREADS];
-long result = 0;
+double parc[8*N_THREADS];
+double result = 0.0;
 
 void* calcula_pi(void* i){
 
@@ -35,28 +36,40 @@ void* calcula_pi(void* i){
     int inicio = tid*termos;
     int fim = tid*termos + termos;
 
-	for(int i = inicio; i < fim; i++)
-        parc[8*tid] += pow(-1,i) / (2*i+1);
+	for(int i = inicio; i < fim; i++){
+        parc[8*tid] += 4*((pow(-1,i)/ (2*i+1))); //Serie 1
+        //parc[8*tid] += //Serie 2
+    }     
+    return 0;   
 }
 
 int main(void){
 
     pthread_t threads[N_THREADS];
     int i;
+    FILE *out = fopen("out.txt","w+");
 
     for(i = 0; i < N_THREADS; i++) 
-        parc[N_THREADS*i] = 0;
+        parc[8*i] = 0;
     
+    struct timespec t1, t2;
+
+    clock_gettime(CLOCK_MONOTONIC, &t1);
     for(i = 0; i < N_THREADS; i++)
         pthread_create(&threads[i], NULL, calcula_pi, (void*)(intptr_t)i);
     
     for(i = 0; i < N_THREADS; i ++){
 
-        pthread_join(threads[i],NULL);
-        result += parc[N_THREADS*i];
+        pthread_join(threads[i], NULL);
+        result += parc[8*i];
+        
     }
-
-    printf("Valor final: %.2ld\n",result);
-
-    return 0;
+    
+    //result += result*4;
+    clock_gettime(CLOCK_MONOTONIC, &t2);
+    double temp = (double)(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/1E9;
+    printf("Valor de pi: %.50lf\n",(double)result);
+    fprintf(out,"\n%d %.4f\n",N_THREADS,temp);
+    fclose(out);
+    //return 0;
 }
