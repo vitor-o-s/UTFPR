@@ -1,6 +1,6 @@
 import type { AWS, AwsLambdaEnvironment } from "@serverless/typescript";
 
-import { serverlessResources, serverlessRoles } from "./configuration";
+import { photoTopic, serverlessResources, serverlessRoles } from "./configuration";
 
 const service = "oficina-integracao";
 
@@ -11,13 +11,22 @@ const configuration: AWS = {
   functions: {
     "new-access-request": {
       handler: "src/handlers.newAccessRequest",
-      timeout: 10,
+      timeout: 20,
       events: [{ http: { method: "POST", path: "new-access" } }]
     },
     "open-close-door": {
       handler: "src/handlers.openCloseDoor",
-      timeout: 10,
       events: [{ http: { method: "PATCH", path: "door" } }]
+    },
+    "notify-user-subscriber": {
+      handler: "src/handlers.notifyUser",
+      events: [
+        {
+          sns: {
+            arn: `arn:aws:sns:\${aws:region}:\${aws:accountId}:${photoTopic}`
+          }
+        }
+      ]
     }
   },
   useDotenv: true,
@@ -28,7 +37,8 @@ const configuration: AWS = {
     stage: "${self:custom.stage}",
     region: "us-east-1",
     versionFunctions: false,
-    timeout: 40,
+    timeout: 10,
+    memorySize: 512, // in mb
     // tracing: {
     //   apiGateway: true,
     //   lambda: true
@@ -36,6 +46,9 @@ const configuration: AWS = {
     environment: {
       STAGE: "${opt:stage,'dev'}",
       AWS_ACCOUNT_REGION: "${aws:region}",
+      TELEGRAM_BOT_TOKEN: "${env:TELEGRAM_BOT_TOKEN}",
+      TELEGRAM_API_URL: "${env:TELEGRAM_API_URL}",
+      TELEGRAM_CHAT_GROUP_ID: "${env:TELEGRAM_CHAT_GROUP_ID}",
       AWS_ACCOUNT_ID: "${aws:accountId}"
     } as AwsLambdaEnvironment,
     iamRoleStatements: serverlessRoles
