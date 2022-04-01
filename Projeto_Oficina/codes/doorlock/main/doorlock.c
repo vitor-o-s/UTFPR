@@ -7,7 +7,6 @@ idf.py -C /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock monitor
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include "esp_log.h"
 #include "driver/gpio.h"
 
