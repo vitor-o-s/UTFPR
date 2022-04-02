@@ -1,7 +1,9 @@
 /*
-idf.py -C /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock build
-idf.py -C /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock -p /dev/ttyUSBx flash
-idf.py -C /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock monitor
+cd /PATH_to_PROJECT/codes/doorlock/
+. $HOME/esp/esp-idf/export.fish
+idf.py build
+idf.py -p /dev/ttyUSBx flash
+idf.py monitor
 */
 
 #include <stdio.h>
