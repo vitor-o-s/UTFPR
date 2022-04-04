@@ -42,6 +42,7 @@
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/coap/libcoap.a
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/nghttp/libnghttp.a
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp-tls/libesp-tls.a
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/libesp32-camera.a
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp_adc_cal/libesp_adc_cal.a
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp_hid/libesp_hid.a
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/tcp_transport/libtcp_transport.a

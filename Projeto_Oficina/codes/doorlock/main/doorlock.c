@@ -1,6 +1,6 @@
 /*
 cd /PATH_to_PROJECT/codes/doorlock/
-. $HOME/esp/esp-idf/export.fish
+. $HOME/esp/esp-idf/export.sh
 idf.py build
 idf.py -p /dev/ttyUSBx flash
 idf.py monitor
@@ -17,13 +17,52 @@ idf.py monitor
 #include "esp_event.h"
 #include "esp_log.h"
 
+#include <nvs_flash.h>
+#include <sys/param.h>
+
+// support IDF 5.x
+#ifndef portTICK_RATE_MS
+#define portTICK_RATE_MS portTICK_PERIOD_MS
+#endif
+
+#include "esp_camera.h"
+
+//#define BOARD_WROVER_KIT 1
+#define BOARD_ESP_EYE 1
+//#define BOARD_ESP32CAM_AITHINKER 1
+
+// WROVER-KIT PIN Map
+#ifdef BOARD_ESP_EYE
+
+#define CAM_PIN_PWDN -1  //power down is not used
+#define CAM_PIN_RESET -1 //software reset will be performed
+#define CAM_PIN_XCLK 4
+#define CAM_PIN_SIOD 18
+#define CAM_PIN_SIOC 23
+
+#define CAM_PIN_D7 36
+#define CAM_PIN_D6 37
+#define CAM_PIN_D5 38
+#define CAM_PIN_D4 39
+#define CAM_PIN_D3 35
+#define CAM_PIN_D2 14
+#define CAM_PIN_D1 13
+#define CAM_PIN_D0 34
+#define CAM_PIN_VSYNC 5
+#define CAM_PIN_HREF 27
+#define CAM_PIN_PCLK 25
+
+#endif
+
+static const char *TAG_CAM = "example:take_picture";
+
 #define BLINK_LED 2
 /* The examples use WiFi configuration that you can set via project configuration menu
    If you'd rather not, just change the below entries to strings with
    the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
 */
-#define EXAMPLE_ESP_WIFI_SSID      
-#define EXAMPLE_ESP_WIFI_PASS      
+#define EXAMPLE_ESP_WIFI_SSID      "206"
+#define EXAMPLE_ESP_WIFI_PASS      "b7nx6Jrw"
 #define EXAMPLE_ESP_MAXIMUM_RETRY  3
 
 #if CONFIG_ESP_WIFI_AUTH_OPEN
@@ -53,10 +92,57 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
 
-static const char *TAG = "wifi station";
+static const char *TAG_WIFI = "wifi station";
 
 static int s_retry_num = 0;
 
+// Camera 
+static camera_config_t camera_config = {
+    .pin_pwdn = CAM_PIN_PWDN,
+    .pin_reset = CAM_PIN_RESET,
+    .pin_xclk = CAM_PIN_XCLK,
+    .pin_sscb_sda = CAM_PIN_SIOD,
+    .pin_sscb_scl = CAM_PIN_SIOC,
+
+    .pin_d7 = CAM_PIN_D7,
+    .pin_d6 = CAM_PIN_D6,
+    .pin_d5 = CAM_PIN_D5,
+    .pin_d4 = CAM_PIN_D4,
+    .pin_d3 = CAM_PIN_D3,
+    .pin_d2 = CAM_PIN_D2,
+    .pin_d1 = CAM_PIN_D1,
+    .pin_d0 = CAM_PIN_D0,
+    .pin_vsync = CAM_PIN_VSYNC,
+    .pin_href = CAM_PIN_HREF,
+    .pin_pclk = CAM_PIN_PCLK,
+
+    //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
+    .xclk_freq_hz = 20000000,
+    .ledc_timer = LEDC_TIMER_0,
+    .ledc_channel = LEDC_CHANNEL_0,
+
+    .pixel_format = PIXFORMAT_RGB565, //YUV422,GRAYSCALE,RGB565,JPEG
+    .frame_size = FRAMESIZE_QVGA,    //QQVGA-UXGA Do not use sizes above QVGA when not JPEG
+
+    .jpeg_quality = 12, //0-63 lower number means higher quality
+    .fb_count = 1,       //if more than one, i2s runs in continuous mode. Use only with JPEG
+    .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
+};
+
+static esp_err_t init_camera()
+{
+    //initialize the camera
+    esp_err_t err = esp_camera_init(&camera_config);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG_CAM, "Camera Init Failed");
+        return err;
+    }
+
+    return ESP_OK;
+}
+
+//Wi-fi
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {
@@ -66,14 +152,14 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY) {
             esp_wifi_connect();
             s_retry_num++;
-            ESP_LOGI(TAG, "retry to connect to the AP");
+            ESP_LOGI(TAG_WIFI, "retry to connect to the AP");
         } else {
             xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
         }
-        ESP_LOGI(TAG,"connect to the AP fail");
+        ESP_LOGI(TAG_WIFI,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG_WIFI, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -118,7 +204,7 @@ void wifi_init_sta(void)
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
     ESP_ERROR_CHECK(esp_wifi_start() );
 
-    ESP_LOGI(TAG, "wifi_init_sta finished.");
+    ESP_LOGI(TAG_WIFI, "wifi_init_sta finished.");
 
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
@@ -131,13 +217,13 @@ void wifi_init_sta(void)
     /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
      * happened. */
     if (bits & WIFI_CONNECTED_BIT) {
-        ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
+        ESP_LOGI(TAG_WIFI, "connected to ap SSID:%s password:%s",
                  EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
     } else if (bits & WIFI_FAIL_BIT) {
-        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
+        ESP_LOGI(TAG_WIFI, "Failed to connect to SSID:%s, password:%s",
                  EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
     } else {
-        ESP_LOGE(TAG, "UNEXPECTED EVENT");
+        ESP_LOGE(TAG_WIFI, "UNEXPECTED EVENT");
     }
 }
 
@@ -147,17 +233,8 @@ void app_main(void)
     char *ourTaskName = pcTaskGetName(NULL);
 
     ESP_LOGI(ourTaskName, "Hello, stating up!\n");
-    /*gpio_reset_pin(BLINK_LED);
-    gpio_set_direction(BLINK_LED, GPIO_MODE_OUTPUT);
 
-    while (1)
-    {
-        gpio_set_level(BLINK_LED,1);
-        vTaskDelay(1000 / portTICK_PERIOD_MS); //clock tick not clock cycle
-        gpio_set_level(BLINK_LED,0);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }*/
-        //Initialize NVS
+    //Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
       ESP_ERROR_CHECK(nvs_flash_erase());
@@ -165,7 +242,24 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+    ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
+
+    if(ESP_OK != init_camera()) {
+        return;
+    }
+    int i =1;
+    while (i==1){
+
+        ESP_LOGI(TAG_CAM, "Taking picture...");
+        camera_fb_t *pic = esp_camera_fb_get();
+
+        // use pic->buf to access the image
+        ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
+        esp_camera_fb_return(pic);
+
+        vTaskDelay(5000 / portTICK_RATE_MS);
+        i = 0;
+    }
     
 }

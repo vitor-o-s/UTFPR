@@ -450,6 +450,13 @@
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp-tls/CMakeFiles/list_install_components.dir
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp-tls/CMakeFiles/edit_cache.dir
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp-tls/CMakeFiles/rebuild_cache.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/install/strip.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/install/local.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/__idf_esp32-camera.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/rebuild_cache.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/edit_cache.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/install.dir
+/home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp32-camera/CMakeFiles/list_install_components.dir
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp_adc_cal/CMakeFiles/install/strip.dir
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp_adc_cal/CMakeFiles/install/local.dir
 /home/vitor/utf/UTFPR/Projeto_Oficina/codes/doorlock/build/esp-idf/esp_adc_cal/CMakeFiles/__idf_esp_adc_cal.dir
