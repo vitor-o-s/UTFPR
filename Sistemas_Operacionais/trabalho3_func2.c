@@ -38,7 +38,7 @@ void* calcula_pi(void* i){
     int fim = tid*termos + termos;
     int numerador = -1/3;
 	  for(int i = inicio; i < fim; i++){
-        parc[8*tid] += (1/pow(16,i)) *((4/(8*i+1)) - (2/(8*i+4)) - (1/(8*i+5)) - (1/(8*i+6))); //(pow(numerador,i)/ (2*i+1));
+        parc[8*tid] += sqrt(12)*(pow(-1,i)/ ((2*i+1)*pow(3,i)));//(1/pow(16,i)) *((4/(8*i+1)) - (2/(8*i+4)) - (1/(8*i+5)) - (1/(8*i+6))); //
     }
     return 0;
 }
