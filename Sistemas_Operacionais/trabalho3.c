@@ -59,7 +59,7 @@ int main(void){
 
         clock_gettime(CLOCK_MONOTONIC, &t1);
         for(i = 0; i < N_THREADS; i++)
-            pthread_create(&threads[i], NULL, calcula_pi, (void*)(intptr_t)i);
+            pthread_create(&threads[i], NULL, calcula_pi, (void*)(intptr_t)(i));
         
         for(i = 0; i < N_THREADS; i ++){
 
