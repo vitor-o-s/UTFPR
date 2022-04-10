@@ -1,6 +1,6 @@
+import { IoTService } from "@services/iot-service";
 import { RekognitionService } from "@services/rekognition-service";
 import { S3Service } from "@services/s3-service";
-import { SnsService } from "@services/sns-service";
 
 import { changeDoorStatusTopic, facesBucket } from "../../configuration";
 
@@ -35,12 +35,11 @@ export class CheckFaceAccessSubscriberFunction extends FunctionSubscriberAbstrac
 
     const faceMatch = await rekognition.searchFace(file.Body as string);
 
-    const sns = new SnsService(changeDoorStatusTopic);
+    const IoT = new IoTService(changeDoorStatusTopic);
 
     const status = faceMatch ? DoorStatusEnum.OPEN : DoorStatusEnum.CLOSE;
 
-    const snsPublishResult = await sns.publish({ status });
-    console.log({ snsPublishResult });
+    await IoT.publishMessage({ status });
   }
 
   static getInstance() {

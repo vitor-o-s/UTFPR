@@ -16,6 +16,11 @@ export const serverlessRoles = [
   },
   {
     Effect: "Allow",
+    Action: ["iot:*"],
+    Resource: "*"
+  },
+  {
+    Effect: "Allow",
     Action: ["sns:Publish"],
     Resource: "*"
   },

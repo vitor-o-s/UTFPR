@@ -1,6 +1,6 @@
 import { Handler } from "aws-lambda/handler";
 
-import { CheckFaceAccessSubscriberFunction } from "@functions/check-face-access-function";
+import { CheckFaceAccessSubscriberFunction } from "@functions/check-face-access-subscriber-function";
 import { NewAccessRequestFunction } from "@functions/new-access-request-function";
 import { NotifyUserSubscriberFunction } from "@functions/notify-user-subscriber-function";
 import { OpenCloseDoorFunction } from "@functions/open-close-door-function";

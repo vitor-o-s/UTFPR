@@ -1,4 +1,4 @@
-import { SnsService } from "@services/sns-service";
+import { IoTService } from "@services/iot-service";
 
 import { changeDoorStatusTopic } from "../../configuration";
 
@@ -22,9 +22,8 @@ export class OpenCloseDoorFunction extends FunctionAbstract<Request, Response> {
   }
 
   protected async execute({ status }: Request): Promise<CustomResponse<Response>> {
-    const sns = new SnsService(changeDoorStatusTopic);
-    const snsPublishResult = await sns.publish({ status });
-    console.log({ snsPublishResult });
+    const IoT = new IoTService(changeDoorStatusTopic);
+    await IoT.publishMessage({ status });
 
     return noContent();
   }

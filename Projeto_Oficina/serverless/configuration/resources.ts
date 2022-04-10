@@ -51,6 +51,49 @@ export const serverlessResources = {
         BucketName: facesBucket,
         AccessControl: "PublicRead"
       }
+    },
+
+    EspThing: {
+      Type: "AWS::IoT::Thing",
+      Properties: {
+        AttributePayload: {
+          Attributes: {
+            SensorType: "soil"
+          }
+        }
+      }
+    },
+    EspThingPolicy: {
+      Type: "AWS::IoT::Policy",
+      Properties: {
+        PolicyDocument: {
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Action: ["iot:Connect", "iot:Publish"],
+              Resource: ["*"]
+            }
+          ]
+        }
+      }
+    },
+    IoTRole: {
+      Type: "AWS::IAM::Role",
+      Properties: {
+        AssumeRolePolicyDocument: {
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Principal: {
+                Service: ["iot.amazonaws.com"]
+              },
+              Action: ["sts:AssumeRole"]
+            }
+          ]
+        }
+      }
     }
   },
   Outputs: {}
