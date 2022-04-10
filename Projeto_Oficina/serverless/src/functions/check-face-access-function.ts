@@ -28,6 +28,7 @@ export class CheckFaceAccessSubscriberFunction extends FunctionSubscriberAbstrac
 
     if (!file.Body) {
       console.log("Arquivo não encontrado");
+      return;
     }
 
     const rekognition = new RekognitionService();
