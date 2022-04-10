@@ -1,8 +1,8 @@
 import { TelegramService } from "@services/telegram-service";
 
-import { FunctionSubscriberAbstract } from "./abstracts/function-subscriber-abstract";
+import { facesBucket } from "../../configuration";
 
-import { facesBucket } from "configuration";
+import { FunctionSubscriberAbstract } from "./abstracts/function-subscriber-abstract";
 
 type Message = { fileKeyId: string; fileContentType: string };
 

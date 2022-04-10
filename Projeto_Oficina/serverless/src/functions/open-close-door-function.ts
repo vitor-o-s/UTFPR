@@ -1,15 +1,12 @@
 import { SnsService } from "@services/sns-service";
 
+import { changeDoorStatusTopic } from "../../configuration";
+
 import { CustomResponse, HttpRequestWrapper } from "./@types";
 import { FunctionAbstract } from "./abstracts/function-abstract";
+import { DoorStatusEnum } from "./enums/door-status-enum";
 
 import { noContent } from "@helpers/response";
-import { changeDoorStatusTopic } from "configuration";
-
-enum DoorStatusEnum {
-  OPEN = "open",
-  CLOSE = "close"
-}
 
 type Request = {
   status: DoorStatusEnum;

@@ -27,6 +27,16 @@ const configuration: AWS = {
           }
         }
       ]
+    },
+    "check-face-access-subscriber": {
+      handler: "src/handlers.checkFaceAccess",
+      events: [
+        {
+          sns: {
+            arn: `arn:aws:sns:\${aws:region}:\${aws:accountId}:${photoTopic}`
+          }
+        }
+      ]
     }
   },
   useDotenv: true,
@@ -49,6 +59,7 @@ const configuration: AWS = {
       TELEGRAM_BOT_TOKEN: "${env:TELEGRAM_BOT_TOKEN}",
       TELEGRAM_API_URL: "${env:TELEGRAM_API_URL}",
       TELEGRAM_CHAT_GROUP_ID: "${env:TELEGRAM_CHAT_GROUP_ID}",
+      REKOGNITION_COLLECTION_ID: "${env:REKOGNITION_COLLECTION_ID}",
       AWS_ACCOUNT_ID: "${aws:accountId}"
     } as AwsLambdaEnvironment,
     iamRoleStatements: serverlessRoles

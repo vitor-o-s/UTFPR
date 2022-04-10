@@ -4,7 +4,7 @@ import { GetObjectOutput, PutObjectOutput } from "aws-sdk/clients/s3";
 export class S3Service {
   private s3: S3;
 
-  constructor(protected bucketName: string, protected accessKey?: string, protected secretAccess?: string) {
+  constructor(protected bucketName: string) {
     const accessKeyId = process.env.ACCESS_KEY;
     const secretAccessKey = process.env.SECRET_ACCESS;
 
