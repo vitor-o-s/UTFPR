@@ -12,8 +12,8 @@
 #include <nvs_flash.h>
 #include <sys/param.h>
 
-#define EXAMPLE_ESP_WIFI_SSID      "206"
-#define EXAMPLE_ESP_WIFI_PASS      "b7nx6Jrw"
+#define EXAMPLE_ESP_WIFI_SSID      ""
+#define EXAMPLE_ESP_WIFI_PASS      ""
 #define EXAMPLE_ESP_MAXIMUM_RETRY  3
 
 #if CONFIG_ESP_WIFI_AUTH_OPEN

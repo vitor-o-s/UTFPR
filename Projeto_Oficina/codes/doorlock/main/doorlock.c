@@ -22,7 +22,7 @@ idf.py -p /dev/ttyUSBx flash monitor
 #include "cam.h"
 #include "wifi.h"
 #include "button.h"
-// #include "request.h"
+#include "request.h"
 
 #ifndef portTICK_RATE_MS
 #define portTICK_RATE_MS portTICK_PERIOD_MS
@@ -88,11 +88,11 @@ void app_main(void)
         // use pic->buf to access the image
         //ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
         //esp_camera_fb_return(pic);
-        
+        get_request();
         //Button example
         printf("cnt: %d\n", cnt++);
         vTaskDelay(5000 / portTICK_RATE_MS);
         //i = 0;
     }
-    
+
 }
