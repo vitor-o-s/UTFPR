@@ -213,7 +213,7 @@ void http_rest_with_url(void)
 void http_rest_with_hostname_path(void)
 {
     esp_http_client_config_t config = {
-        .host = "api.github.com",
+        .host = "140.82.112.6",
         .path = "/users/gprando55",
         .transport_type = HTTP_TRANSPORT_OVER_TCP,
         .event_handler = _http_event_handler,
@@ -298,7 +298,7 @@ void http_rest_with_hostname_path(void)
 
 void get_request(void) {
         esp_http_client_config_t config = {
-        .host = "api.github.com",
+        .host = "140.82.112.6",
         .path = "/users/gprando55",
         .transport_type = HTTP_TRANSPORT_OVER_TCP,
         .event_handler = _http_event_handler,
@@ -321,7 +321,7 @@ void get_request(void) {
 void https_with_url(void)
 {
     esp_http_client_config_t config = {
-        .url = "https://api.github.com/users/gprando55",
+        .url = "https://140.82.112.6/users/gprando55",
         .event_handler = _http_event_handler,
         .crt_bundle_attach = esp_crt_bundle_attach,
     };
@@ -341,7 +341,7 @@ void https_with_url(void)
 void https_with_hostname_path(void)
 {
     esp_http_client_config_t config = {
-        .host = "api.github.com",
+        .host = "140.82.112.6",
         .path = "/users/gprando55",
         .transport_type = HTTP_TRANSPORT_OVER_SSL,
         .event_handler = _http_event_handler,

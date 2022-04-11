@@ -37,7 +37,7 @@ void app_main(void)
 
     ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
-    ESP_LOGI(TAG_WIFI, "wifi pulado");
+    //ESP_LOGI(TAG_WIFI, "wifi pulado");
     
     if(ESP_OK != init_camera()) {
         return;
@@ -52,11 +52,10 @@ void app_main(void)
         // use pic->buf to access the image
         ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
         esp_camera_fb_return(pic);
-
+        get_request();
         vTaskDelay(5000 / portTICK_RATE_MS);
-        i = 0;
+
+        //i = 0;
     }
 
-    get_request();
-    
 }
