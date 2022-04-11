@@ -1,3 +1,12 @@
+/* ESP HTTP Client Example
+
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
+
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+*/
+
 #include <string.h>
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
@@ -7,11 +16,8 @@
 #include "nvs_flash.h"
 #include "esp_event.h"
 #include "esp_netif.h"
-// #include "protocol_examples_common.h"
 #include "esp_tls.h"
-#if CONFIG_MBEDTLS_CERTIFICATE_BUNDLE
 #include "esp_crt_bundle.h"
-#endif
 
 #include "esp_http_client.h"
 
@@ -22,7 +28,7 @@ static const char *TAG = "HTTP_CLIENT";
 /* Root cert for howsmyssl.com, taken from howsmyssl_com_root_cert.pem
 
    The PEM file was extracted from the output of this command:
-   openssl s_client -showcerts -connect www.howsmyssl.com:443 </dev/null
+   openssl s_client -showcerts -connect https://api.github.com/users/gprando55:443 </dev/null
 
    The CA root cert is the last cert given in the chain of certs.
 
@@ -102,20 +108,113 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
             }
             output_len = 0;
             break;
-        case HTTP_EVENT_REDIRECT:
-            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
-            esp_http_client_set_header(evt->client, "From", "user@example.com");
-            esp_http_client_set_header(evt->client, "Accept", "text/html");
-            break;
     }
     return ESP_OK;
+}
+
+void http_rest_with_url(void)
+{
+    char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};
+    /**
+     * NOTE: All the configuration parameters for http_client must be spefied either in URL or as host and path parameters.
+     * If host and path parameters are not set, query parameter will be ignored. In such cases,
+     * query parameter should be specified in URL.
+     *
+     * If URL as well as host and path parameters are specified, values of host and path will be considered.
+     */
+    esp_http_client_config_t config = {
+        .host = "httpbin.org",
+        .path = "/get",
+        .query = "esp",
+        .event_handler = _http_event_handler,
+        .user_data = local_response_buffer,        // Pass address of local buffer to get response
+        .disable_auto_redirect = true,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+
+    // GET
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP GET request failed: %s", esp_err_to_name(err));
+    }
+    ESP_LOG_BUFFER_HEX(TAG, local_response_buffer, strlen(local_response_buffer));
+
+    // POST
+    const char *post_data = "{\"field1\":\"value1\"}";
+    esp_http_client_set_url(client, "http://httpbin.org/post");
+    esp_http_client_set_method(client, HTTP_METHOD_POST);
+    esp_http_client_set_header(client, "Content-Type", "application/json");
+    esp_http_client_set_post_field(client, post_data, strlen(post_data));
+    err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
+    }
+
+    //PUT
+    esp_http_client_set_url(client, "http://httpbin.org/put");
+    esp_http_client_set_method(client, HTTP_METHOD_PUT);
+    err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP PUT Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP PUT request failed: %s", esp_err_to_name(err));
+    }
+
+    //PATCH
+    esp_http_client_set_url(client, "http://httpbin.org/patch");
+    esp_http_client_set_method(client, HTTP_METHOD_PATCH);
+    esp_http_client_set_post_field(client, NULL, 0);
+    err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP PATCH Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP PATCH request failed: %s", esp_err_to_name(err));
+    }
+
+    //DELETE
+    esp_http_client_set_url(client, "http://httpbin.org/delete");
+    esp_http_client_set_method(client, HTTP_METHOD_DELETE);
+    err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP DELETE Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP DELETE request failed: %s", esp_err_to_name(err));
+    }
+
+    //HEAD
+    esp_http_client_set_url(client, "http://httpbin.org/get");
+    esp_http_client_set_method(client, HTTP_METHOD_HEAD);
+    err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP HEAD Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP HEAD request failed: %s", esp_err_to_name(err));
+    }
+
+    esp_http_client_cleanup(client);
 }
 
 void http_rest_with_hostname_path(void)
 {
     esp_http_client_config_t config = {
-        .host = "httpbin.org",
-        .path = "/get",
+        .host = "api.github.com",
+        .path = "/users/gprando55",
         .transport_type = HTTP_TRANSPORT_OVER_TCP,
         .event_handler = _http_event_handler,
     };
@@ -124,7 +223,7 @@ void http_rest_with_hostname_path(void)
     // GET
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -138,7 +237,7 @@ void http_rest_with_hostname_path(void)
     esp_http_client_set_post_field(client, post_data, strlen(post_data));
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -150,7 +249,7 @@ void http_rest_with_hostname_path(void)
     esp_http_client_set_method(client, HTTP_METHOD_PUT);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP PUT Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTP PUT Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -163,7 +262,7 @@ void http_rest_with_hostname_path(void)
     esp_http_client_set_post_field(client, NULL, 0);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP PATCH Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTP PATCH Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -175,7 +274,7 @@ void http_rest_with_hostname_path(void)
     esp_http_client_set_method(client, HTTP_METHOD_DELETE);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP DELETE Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTP DELETE Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -187,7 +286,7 @@ void http_rest_with_hostname_path(void)
     esp_http_client_set_method(client, HTTP_METHOD_HEAD);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP HEAD Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTP HEAD Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -197,20 +296,40 @@ void http_rest_with_hostname_path(void)
     esp_http_client_cleanup(client);
 }
 
-void https_with_hostname_path(void)
+void get_request(void) {
+        esp_http_client_config_t config = {
+        .host = "api.github.com",
+        .path = "/users/gprando55",
+        .transport_type = HTTP_TRANSPORT_OVER_TCP,
+        .event_handler = _http_event_handler,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+
+    // GET
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP GET request failed: %s", esp_err_to_name(err));
+    }
+
+    esp_http_client_cleanup(client);
+}
+
+void https_with_url(void)
 {
     esp_http_client_config_t config = {
-        .host = "www.howsmyssl.com",
-        .path = "/",
-        .transport_type = HTTP_TRANSPORT_OVER_SSL,
+        .url = "https://api.github.com/users/gprando55",
         .event_handler = _http_event_handler,
-        .cert_pem = howsmyssl_com_root_cert_pem_start,
+        .crt_bundle_attach = esp_crt_bundle_attach,
     };
     esp_http_client_handle_t client = esp_http_client_init(&config);
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -219,33 +338,24 @@ void https_with_hostname_path(void)
     esp_http_client_cleanup(client);
 }
 
-// static void http_test_task(void *pvParameters)
-// {
-//     http_rest_with_hostname_path();
+void https_with_hostname_path(void)
+{
+    esp_http_client_config_t config = {
+        .host = "api.github.com",
+        .path = "/users/gprando55",
+        .transport_type = HTTP_TRANSPORT_OVER_SSL,
+        .event_handler = _http_event_handler,
+        .cert_pem = howsmyssl_com_root_cert_pem_start,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    esp_err_t err = esp_http_client_perform(client);
 
-//     https_with_hostname_path();
-
-//     ESP_LOGI(TAG, "Finish http example");
-//     vTaskDelete(NULL);
-// }
-
-// void app_main(void)
-// {
-//     esp_err_t ret = nvs_flash_init();
-//     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-//       ESP_ERROR_CHECK(nvs_flash_erase());
-//       ret = nvs_flash_init();
-//     }
-//     ESP_ERROR_CHECK(ret);
-//     ESP_ERROR_CHECK(esp_netif_init());
-//     ESP_ERROR_CHECK(esp_event_loop_create_default());
-
-//     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-//      * Read "Establishing Wi-Fi or Ethernet Connection" section in
-//      * examples/protocols/README.md for more information about this function.
-//      */
-//     ESP_ERROR_CHECK(example_connect());
-//     ESP_LOGI(TAG, "Connected to AP, begin http example");
-
-//     xTaskCreate(&http_test_task, "http_test_task", 8192, NULL, 5, NULL);
-// }
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "Error perform http request %s", esp_err_to_name(err));
+    }
+    esp_http_client_cleanup(client);
+}

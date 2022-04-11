@@ -23,7 +23,7 @@ idf.py monitor
 #include "cam.h"
 #include "wifi.h"
 #include "button.h"
-// #include "request.h"
+#include "request.h"
 
 void app_main(void)
 {
@@ -56,5 +56,7 @@ void app_main(void)
         vTaskDelay(5000 / portTICK_RATE_MS);
         i = 0;
     }
+
+    get_request();
     
 }
