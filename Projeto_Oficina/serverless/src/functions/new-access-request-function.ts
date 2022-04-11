@@ -3,11 +3,12 @@ import { v4 } from "uuid";
 import { S3Service } from "@services/s3-service";
 import { SnsService } from "@services/sns-service";
 
+import { facesBucket, photoTopic } from "../../configuration";
+
 import { CustomResponse, HttpRequestWrapper } from "./@types";
 import { FunctionAbstract } from "./abstracts/function-abstract";
 
 import { noContent } from "@helpers/response";
-import { facesBucket, photoTopic } from "configuration";
 
 type Request = {
   fileEncoded: string;
