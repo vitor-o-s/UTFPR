@@ -16,6 +16,7 @@
 #include "driver/gpio.h"
 
 #include "cam.h"
+#include "request.h"
 
 #define GPIO_INPUT_IO_0     15
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<GPIO_INPUT_IO_0))
@@ -47,9 +48,9 @@ static void gpio_task_example(void* arg)
             // use pic->buf to access the image
             ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
             esp_camera_fb_return(pic);
-            //pic->buf
+            
             // fazer requisição http para o servidor
-            // get_request();
+            post_request(pic->buf);
 
             printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
             gpio_set_intr_type(GPIO_INPUT_IO_0, GPIO_INTR_NEGEDGE);
