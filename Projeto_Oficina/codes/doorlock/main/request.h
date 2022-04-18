@@ -210,6 +210,7 @@ void http_rest_with_url(void)
     esp_http_client_cleanup(client);
 }
 
+// exemplos
 void http_rest_with_hostname_path(void)
 {
     esp_http_client_config_t config = {
@@ -291,6 +292,34 @@ void http_rest_with_hostname_path(void)
                 esp_http_client_get_content_length(client));
     } else {
         ESP_LOGE(TAG, "HTTP HEAD request failed: %s", esp_err_to_name(err));
+    }
+
+    esp_http_client_cleanup(client);
+}
+
+void post_request(uint8_t * buf)
+{
+    esp_http_client_config_t config = {
+        .host = "140.82.112.6",
+        .path = "/users/gprando55",
+        .transport_type = HTTP_TRANSPORT_OVER_TCP,
+        .event_handler = _http_event_handler,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+
+    // POST mandar buf aqui
+    //
+    const char *post_data = "field1=value1&field2=value2";
+    esp_http_client_set_url(client, "/post");
+    esp_http_client_set_method(client, HTTP_METHOD_POST);
+    esp_http_client_set_post_field(client, post_data, strlen(post_data));
+    err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+                esp_http_client_get_status_code(client),
+                esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
     }
 
     esp_http_client_cleanup(client);

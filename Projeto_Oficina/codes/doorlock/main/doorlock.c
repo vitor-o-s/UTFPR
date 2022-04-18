@@ -77,15 +77,6 @@ void app_main(void)
     int i =1;
     int cnt = 0;
     while (i==1){
-
-        ESP_LOGI(TAG_CAM, "Taking picture...");
-        camera_fb_t *pic = esp_camera_fb_get();
-
-        // use pic->buf to access the image
-        ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
-        esp_camera_fb_return(pic);
-        //get_request();
-        //Button example
         printf("cnt: %d\n", cnt++);
         vTaskDelay(5000 / portTICK_RATE_MS);
         //i = 0;
