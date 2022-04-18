@@ -296,7 +296,7 @@ void http_rest_with_hostname_path(void)
 
     esp_http_client_cleanup(client);
 }
-
+/*
 void post_request(uint8_t * buf)
 {
     esp_http_client_config_t config = {
@@ -324,7 +324,7 @@ void post_request(uint8_t * buf)
 
     esp_http_client_cleanup(client);
 }
-
+*/
 void get_request(void) {
         esp_http_client_config_t config = {
         .host = "140.82.112.6",

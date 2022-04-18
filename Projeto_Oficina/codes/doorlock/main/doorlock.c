@@ -19,7 +19,7 @@ idf.py -p /dev/ttyUSBx flash monitor
 #include <nvs_flash.h>
 #include <sys/param.h>
 
-#include "cam.h"
+//#include "cam.h"
 #include "wifi.h"
 #include "button.h"
 #include "request.h"
@@ -40,7 +40,7 @@ void app_main(void)
     //wifi_init_sta();
     ESP_LOGI(TAG_WIFI, "wifi pulado");
     
-    if(ESP_OK != init_camera()) {
+   if(ESP_OK != init_camera()) {
         return;
     }
 
