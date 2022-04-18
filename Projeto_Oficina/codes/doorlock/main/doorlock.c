@@ -24,29 +24,25 @@ idf.py -p /dev/ttyUSBx flash monitor
 #include "button.h"
 #include "request.h"
 
-#ifndef portTICK_RATE_MS
-#define portTICK_RATE_MS portTICK_PERIOD_MS
-#endif
-
 void app_main(void)
 {
     //Initialize NVS
     static const char *TAG_LOGI = "example:Logging";
     ESP_LOGI(TAG_LOGI, "Hello, Starting up!");
-    /*esp_err_t ret = nvs_flash_init();
+    esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
       ESP_ERROR_CHECK(nvs_flash_erase());
       ret = nvs_flash_init();
     }
-    ESP_ERROR_CHECK(ret);*/
+    ESP_ERROR_CHECK(ret);
 
     //ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
     //wifi_init_sta();
     ESP_LOGI(TAG_WIFI, "wifi pulado");
     
-    /*if(ESP_OK != init_camera()) {
+    if(ESP_OK != init_camera()) {
         return;
-    }*/
+    }
 
     //Init GPIO TASKS
     
@@ -72,7 +68,7 @@ void app_main(void)
     xTaskCreate(gpio_task_example, "gpio_task_example", 2048, NULL, 10, NULL);
 
     //install gpio isr service
-    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+    //gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
     //hook isr handler for specific gpio pin
     gpio_isr_handler_add(GPIO_INPUT_IO_0, gpio_isr_handler, (void*) GPIO_INPUT_IO_0);
 
@@ -82,13 +78,13 @@ void app_main(void)
     int cnt = 0;
     while (i==1){
 
-        //ESP_LOGI(TAG_CAM, "Taking picture...");
-        //camera_fb_t *pic = esp_camera_fb_get();
+        ESP_LOGI(TAG_CAM, "Taking picture...");
+        camera_fb_t *pic = esp_camera_fb_get();
 
         // use pic->buf to access the image
-        //ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
-        //esp_camera_fb_return(pic);
-        get_request();
+        ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
+        esp_camera_fb_return(pic);
+        //get_request();
         //Button example
         printf("cnt: %d\n", cnt++);
         vTaskDelay(5000 / portTICK_RATE_MS);
