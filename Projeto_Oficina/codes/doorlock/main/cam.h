@@ -1,11 +1,8 @@
-
 #include "esp_camera.h"
 
-//#define BOARD_WROVER_KIT 1
 #define BOARD_ESP_EYE 1
-//#define BOARD_ESP32CAM_AITHINKER 1
 
-// WROVER-KIT PIN Map
+// ESP_EYE PIN Map
 #ifdef BOARD_ESP_EYE
 
 #define CAM_PIN_PWDN -1  //power down is not used
