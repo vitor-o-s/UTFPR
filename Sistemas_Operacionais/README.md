@@ -67,6 +67,20 @@ Mas com este encapsulamento é necessário criar um método para invocar as roti
 
 ## Capítulo 3 - Arquiteturas de SOs
 
+Para este capítulo, recomendo a leitura do livro, uma vez que o mesmo tem ótimas imagens,contudo falando brevemente sobre arquiteturas temos:
+
+* Sistemas Monolíticos:
+* Sistemas Micronúcleo:
+* Sistemas em Camadas:
+* Sistemas Híbridos:
+
+Além disso podemos falar de algumas arquiteturas mais avançadas como:
+
+* Máquinas Virtuais:
+* Contêineres:
+* Sistemas exonúcleo:
+* Sistemas uninúcleo:
+
 ## Capítulo 4 - O conceito de tarefa
 
 ## Capítulo 5 - Implementação de tarefas
