@@ -55,7 +55,7 @@ void app_main(void)
   // create a queue to handle gpio event from isr
   gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
   // start gpio task
-  xTaskCreate(gpio_task_example, "gpio_task_example", 8000, NULL, 10, NULL);
+  xTaskCreate(gpio_task_example, "gpio_task_example", 8192, NULL, 10, NULL);
 
   // hook isr handler for specific gpio pin
   gpio_isr_handler_add(GPIO_INPUT_IO_0, gpio_isr_handler, (void *)GPIO_INPUT_IO_0);

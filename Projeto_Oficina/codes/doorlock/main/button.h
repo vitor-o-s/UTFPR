@@ -50,7 +50,7 @@ static void gpio_task_example(void* arg)
             esp_camera_fb_return(pic);
 
             // fazer requisição http para o servidor
-            http_post();
+            http_post(pic->buf);
 
             printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
             gpio_set_intr_type(GPIO_INPUT_IO_0, GPIO_INTR_NEGEDGE);

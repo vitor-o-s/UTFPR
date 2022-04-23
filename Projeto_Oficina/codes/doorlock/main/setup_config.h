@@ -2,7 +2,7 @@
 #include <sys/param.h>
 #include "esp_log.h"
 
-void setup_init(char *TAG_LOGI)
+void setup_init(const char *TAG_LOGI)
 {
   ESP_LOGI(TAG_LOGI, "Hello, Starting up!");
 
