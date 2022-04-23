@@ -4,7 +4,7 @@ cd /PATH_to_PROJECT/codes/doorlock/
 idf.py build
 idf.py -p /dev/ttyUSBx flash monitor
 */
-
+//Remover libs
 #include <stdio.h>
 #include "driver/gpio.h"
 #include <string.h>
@@ -18,22 +18,21 @@ idf.py -p /dev/ttyUSBx flash monitor
 #include "wifi.h"
 #include "button.h"
 #include "setup_config.h"
+#include "mqtt.h"
 
 static const char *TAG_LOGI = "doorlock";
 
 void app_main(void)
 {
   // Initialize NVS
-  ESP_LOGI(TAG_LOGI, "Hello, Starting up!");
-
   setup_init(TAG_LOGI);
-
+  
   wifi_init_sta();
   // ESP_LOGI(TAG_WIFI, "wifi pulado");
 
   if (ESP_OK != init_camera())
   {
-    return;
+    return;//A funcao init_camera instala o gpio isr service
   }
 
   // Init GPIO TASKS
@@ -58,12 +57,31 @@ void app_main(void)
   // start gpio task
   xTaskCreate(gpio_task_example, "gpio_task_example", 8000, NULL, 10, NULL);
 
-  // install gpio isr service
-  // gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
   // hook isr handler for specific gpio pin
   gpio_isr_handler_add(GPIO_INPUT_IO_0, gpio_isr_handler, (void *)GPIO_INPUT_IO_0);
 
   printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+  //Init MQTT
+
+  //Apenas LOG_DEBUG
+  //ESP_LOGI(TAG, "[APP] Startup..");
+  //ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
+  //ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
+
+  esp_log_level_set("*", ESP_LOG_INFO);
+  esp_log_level_set("esp-tls", ESP_LOG_VERBOSE);
+  esp_log_level_set("MQTT_CLIENT", ESP_LOG_VERBOSE);
+  esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
+  esp_log_level_set("TRANSPORT_BASE", ESP_LOG_VERBOSE);
+  esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
+  esp_log_level_set("OUTBOX", ESP_LOG_VERBOSE);
+
+  //ESP_ERROR_CHECK(nvs_flash_init()); Ja foi iniciado pela camera
+  ESP_ERROR_CHECK(esp_netif_init());
+  ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+  mqtt_app_start();
 
   int i = 1;
   int cnt = 0;
@@ -71,6 +89,5 @@ void app_main(void)
   {
     printf("cnt: %d\n", cnt++);
     vTaskDelay(5000 / portTICK_RATE_MS);
-    // i = 0;
   }
 }

@@ -4,7 +4,6 @@
 
 void setup_init(char *TAG_LOGI)
 {
-  // Initialize NVS
   ESP_LOGI(TAG_LOGI, "Hello, Starting up!");
 
   esp_err_t ret = nvs_flash_init();

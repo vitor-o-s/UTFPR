@@ -14,12 +14,12 @@
 
 ## Cronograma
 
-| Tarefa | Data de entrega
-|:---:|:---:
-| Criar Recursos na AWS | 25/03
-| Captura do evento no ESP32 | 08/04
-| Coleta de imagem no ESP32 | 22/04
-| Envio de imagem via ESP32 | 13/05
+| Tarefa | Data de entrega | Status
+|:---:|:---:|:---:
+| Criar Recursos na AWS | 25/03 | OK
+| Captura do evento no ESP32 | 08/04 | OK
+| Coleta de imagem no ESP32 | 22/04 | OK
+| Envio de imagem via ESP32 | 13/05 | EM ANDAMENTO
 | População inicial do Dynamo e Teste de Reconhecimento | 27/05
 | Acionamento LED de indicação via ESP32| 27/05
 | Teste e coleta de Resultados | 10/06
