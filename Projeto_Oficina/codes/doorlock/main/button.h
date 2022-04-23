@@ -48,9 +48,9 @@ static void gpio_task_example(void* arg)
             // use pic->buf to access the image
             ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
             esp_camera_fb_return(pic);
-            
+
             // fazer requisição http para o servidor
-            post_request(pic->buf);
+            http_post();
 
             printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
             gpio_set_intr_type(GPIO_INPUT_IO_0, GPIO_INTR_NEGEDGE);

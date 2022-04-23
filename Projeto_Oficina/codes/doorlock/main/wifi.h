@@ -12,8 +12,8 @@
 #include <nvs_flash.h>
 #include <sys/param.h>
 
-#define EXAMPLE_ESP_WIFI_SSID      ""
-#define EXAMPLE_ESP_WIFI_PASS      ""
+#define EXAMPLE_ESP_WIFI_SSID      "206"
+#define EXAMPLE_ESP_WIFI_PASS      "b7nx6Jrw"
 #define EXAMPLE_ESP_MAXIMUM_RETRY  3
 
 #if CONFIG_ESP_WIFI_AUTH_OPEN
@@ -73,6 +73,8 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 void wifi_init_sta(void)
 {
+    ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
+    
     s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());
