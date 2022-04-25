@@ -49,8 +49,11 @@ char url_string[512] = "https://eq62sd0kbj.execute-api.us-east-1.amazonaws.com";
    To embed it in the app binary, the PEM file is named
    in the component.mk COMPONENT_EMBED_TXTFILES variable.
 */
-extern const char aws_api_gateway_cert_pem_start[] asm("_binary_aws_api_gateway_cert_pem_start");
-extern const char aws_api_gateway_cert_pem_end[]   asm("_binary_aws_api_gateway_cert_pem_end");
+extern const char client01_pem_start[] asm("_binary_client01_pem_start");
+extern const char client01_pem_end[]   asm("_binary_client01_pem_end");
+
+extern const char client01_key_start[] asm("_binary_client01_key_start");
+extern const char client01_key_end[]   asm("_binary_client01_key_end");
 
 
 esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
@@ -128,9 +131,11 @@ static void https_perform_post(uint8_t *buf) {
     char output_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};   // Buffer to store response of http request
     esp_http_client_config_t config = {
         .url = "https://eq62sd0kbj.execute-api.us-east-1.amazonaws.com",
-        .transport_type = HTTP_TRANSPORT_OVER_SSL,
+        .transport_type = HTTP_TRANSPORT_OVER_TCP,
         .event_handler = _http_event_handler,
-        .cert_pem = aws_api_gateway_cert_pem_start,
+        .cert_pem = client01_pem_start,
+        .client_key_pem = client01_key_start,
+
 		.user_data = output_buffer,
     };
     //POST
