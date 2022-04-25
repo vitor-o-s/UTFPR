@@ -131,12 +131,11 @@ static void https_perform_post(uint8_t *buf) {
     char output_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};   // Buffer to store response of http request
     esp_http_client_config_t config = {
         .url = "https://eq62sd0kbj.execute-api.us-east-1.amazonaws.com",
-        .transport_type = HTTP_TRANSPORT_OVER_TCP,
+        .transport_type = HTTP_TRANSPORT_OVER_SSL,
         .event_handler = _http_event_handler,
-        .cert_pem = client01_pem_start,
+        .client_cert_pem = client01_pem_start,
         .client_key_pem = client01_key_start,
-
-		.user_data = output_buffer,
+		    .user_data = output_buffer,
     };
     //POST
     ESP_LOGW(POST_TAG, "Iniciare");
