@@ -15,10 +15,10 @@ idf.py -p /dev/ttyUSBx flash monitor
 #include "esp_event.h"
 #include "esp_log.h"
 
-//#include "wifi.h"
+#include "wifi.h"
 #include "button.h"
 #include "setup_config.h"
-#include "wpa2.h"
+// #include "wpa2.h"
 // #include "mqtt.h"
 
 static const char *TAG_LOGI = "doorlock";
@@ -28,13 +28,15 @@ void app_main(void)
   // Initialize NVS
   setup_init(TAG_LOGI);
 
-  //wifi_init_sta();
+  wifi_init_sta();
+
+  /*
   //WPA2
   ESP_ERROR_CHECK( nvs_flash_init() );
   initialise_wifi();
   xTaskCreate(&wpa2_enterprise_example_task, "wpa2_enterprise_example_task", 4096, NULL, 5, NULL);
   // ESP_LOGI(TAG_WIFI, "wifi pulado");
-
+  */
   if (ESP_OK != init_camera())
   {
     return;//A funcao init_camera instala o gpio isr service

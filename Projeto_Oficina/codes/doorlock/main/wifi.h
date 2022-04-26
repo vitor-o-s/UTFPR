@@ -12,42 +12,9 @@
 #include <nvs_flash.h>
 #include <sys/param.h>
 
-
-//From WPA2
-#include <string.h>
-#include <stdlib.h>
-#include "esp_wpa2.h"
-#include "esp_netif.h"
-
 #define EXAMPLE_ESP_WIFI_SSID      "206"
 #define EXAMPLE_ESP_WIFI_PASS      "b7nx6Jrw"
 #define EXAMPLE_ESP_MAXIMUM_RETRY  3
-
-//WPA2CONFIG
-#define WPA2_WIFI_SSID "UTFPR-ALUNO"
-#define WPA2_EAP_METHOD "PEAP"
-
-#define WPA2_EAP_ID "a2037904"
-#define WPA2_EAP_USERNAME "a2037904"
-#define WPA2_EAP_PASSWORD "sgpozk53"
-
-/*#if CONFIG_ESP_WIFI_AUTH_OPEN
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_OPEN
-#elif CONFIG_ESP_WIFI_AUTH_WEP
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WEP
-#elif CONFIG_ESP_WIFI_AUTH_WPA_PSK
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA_PSK
-#elif CONFIG_ESP_WIFI_AUTH_WPA2_PSK
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA2_PSK
-#elif CONFIG_ESP_WIFI_AUTH_WPA_WPA2_PSK
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA_WPA2_PSK
-#elif CONFIG_ESP_WIFI_AUTH_WPA3_PSK
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA3_PSK
-#elif CONFIG_ESP_WIFI_AUTH_WPA2_WPA3_PSK
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA2_WPA3_PSK
-#elif CONFIG_ESP_WIFI_AUTH_WAPI_PSK
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WAPI_PSK
-#endif*/
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
@@ -88,7 +55,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 void wifi_init_sta(void)
 {
     ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
-    
+
     s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());
