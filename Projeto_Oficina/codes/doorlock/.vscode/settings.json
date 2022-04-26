@@ -18,6 +18,8 @@
     "setup_config.h": "c",
     "esp_http_client.h": "c",
     "socket.h": "c",
-    "mqtt.h": "c"
+    "mqtt.h": "c",
+    "cjson.h": "c",
+    "string": "c"
   }
 }
