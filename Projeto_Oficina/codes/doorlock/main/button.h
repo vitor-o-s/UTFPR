@@ -17,6 +17,7 @@
 
 #include "cam.h"
 #include "request.h"
+#include "custom_base64.h"
 
 #define GPIO_INPUT_IO_0     15
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<GPIO_INPUT_IO_0))
@@ -49,8 +50,11 @@ static void gpio_task_example(void* arg)
             ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
             esp_camera_fb_return(pic);
 
+            uint8_t *base_64 = get_base64(pic);
+
             // fazer requisição http para o servidor
-            http_post();
+            // http_post(pic->buf);
+            http_post(base_64);
 
             printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
             gpio_set_intr_type(GPIO_INPUT_IO_0, GPIO_INTR_NEGEDGE);
