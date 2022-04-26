@@ -157,12 +157,14 @@ static void https_perform_post(uint8_t *buf) {
 	  */
 	// The example had this, but to add the chat id easierly I decided not to use a pointer
 	// const char *post_data = "{\"chat_id\":852596694,\"text\":\"Envio de post\"}";
-	  const char *post_data = "{\"fileEncoded\": \"teste\"}";
+	  // const char *post_data = "{\"fileEncoded\": \"replace\"}";
+	  // const char post_data[30+strlen((char*)buf)];
 	  // sprintf(post_data,"{\"fileEncoded\": \"%s\"}", (char *)buf);
-    //ESP_LOGW(HTTP_TAG, "El json es es: %s",post_data);
+
+    // ESP_LOGW(HTTP_TAG, "El json es es: %s",post_data);
     esp_http_client_set_method(client, HTTP_METHOD_POST);
     esp_http_client_set_header(client, "Content-Type", "application/json");
-    esp_http_client_set_post_field(client, post_data, strlen(post_data));
+    esp_http_client_set_post_field(client, (const char *)buf, strlen((const char *)buf));
 
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
