@@ -83,8 +83,60 @@ Além disso podemos falar de algumas arquiteturas mais avançadas como:
 
 ## Capítulo 4 - O conceito de tarefa
 
+O conceito de tarefa surge diante da necessidade de atender a grande quantidade de tarefas que o sistema operacional deve realizar da melhor forma possível,já que existem mais tarefas do que processadores. Definimos tarefa como "um fluxo sequencial de isntruções, construído para atender uma finalidade específica". Há uma diferença a ser notada, um programa é estático, apresenta o código/instruções, já a tarefa é dinâmica e possui um estado interno com a execução das instruções.
+
+### Gerência de tarefas
+
+> Em um computador, o processador tem de executar todas as tarefas submetidas pelos usuários. Essas tarefas geralmente têm comportamento, duração e importância distintas. Cabe ao sistema operacional organizar as tarefas para executá-las e decidir em que ordem fazê-lo. Nesta seção será estudada a organização básica do sistema de gerência de tarefas e sua evolução histórica.
+
+* Sistema Monotarefa: Executam 1 tarefa por vez, eram usados no inicio da computação. A máquina de estado deste modelo é simple "Novo -> Executando -> Terminado".
+* Monitor de Sistema: O programa monitor era carregado na memória no início da oepração do sistema, era responsável por gerenciar a fila de tarefas, entradas e saídas.
+* Sistemas Multitarefas: Nesse sistema várias tarefas podiam estar em andamento simultaneamente, uma vez que o tempo de recuperação de entradas (que estavam na memória) era alto o monitor colocava uma tarafa em suspensão até que sua entrada fosse carregada e executava outro fluxo neste período. A complexidade aumentou uma vez que era necessário manter o estado de uma tarefa salva também. A máquina de estado aqui fica mais interessante "Novo -> Pronto -> Executando/<- Suspenso -> Terminado" onde suspenso voltaria a fila de prontos para executar.
+* Sistemas de Tempo Compartilhado: Para resolver o problema de tarefas "sem fim" foi adicionado o conceito de fatia de tempo ou também chamado "quantum", ou seja uma tarefa será executada por um quantum prédefinido depois voltara a fila de "Pronto" ou "Terminado" e uma tarefa diferente poderá ser executada. O ato de tirar o recurso de uma tarefa é o que chamamos de "preempeção". A máquina de estado aqui fica desta forma "Novo -> Pronto -> <- Executando/<- Suspenso -> Terminado" onde suspenso e executando podem voltar a fila de prontos para executar.
+
 ## Capítulo 5 - Implementação de tarefas
+
+A primeira coisa que precisamos pensar sobre uma tarefa é seu contexto, ou o estado dela em um determinado instante. O contexto contém informações sobre recursos usado por ela, arquivos abertos, conexões de rede, semáforos, contador de programa (PC) e apontador de pilha (SP). Cada tarefa possui um descritor (estrutura de dados) para armazenar o contexto e outros dados necessários. Essa estrutura chamamos  *TCB (Task Controle Block) ou PCB (Process Control Block)*.
+Para mover um tarefa para o estado de suspensa é necessário ter cuidado ao manipular seu TCB. um conjunto de rotinas denominado *despachante (dispatcher)* é quem cuida dessas operações. Já o *escalonador (scheduler)* é quem fica responsável por escolher a próxima tarefa a ser executada. A troca de contexto pode ser pelo fim do quantum, uma interrupção ou mesmo erro. É importante estar atento pois quanto menos trocas fizermos mais performatico será nosso sistema operacional.
+
+### Processos
+
+Atulmente podemos dizer que um processo é uma unidade de contexto (não mais uma unidade de tarefa como nos sistemas operacionais mais antigos), assim um processo pode conter váias tarefas compartilhando os mesmos recursos, mas mantendo a segurança entre outros processos. As PCBs armazenam, informações como inicio, caminho para o código, PID e mais, ja  as TCBs são mais simples armazenando apenas o identificador, registrados e uma referencia ao processo pai. Importante notar que, trocar de tarefa dentro de um mesmo processo é mais ráido do que trocar entre tarefas de processos diferentes.
+Para realizarmos operações com processos é necessário utilizar chamadas de sistemas (variam de acordo com o sistema operacional), podemos citar aqui por exemplo:
+
+* fork(): cria uma cópia exata de si. Essa cópia chamada de filho (child) recebe o mesmo estado interno do pai, acessa o mesmo recurso do kernel porém executa em área distinta da memória. Essa chamada retorna duas vezes 1 para o pai e outra para o filho.
+* execve(): o uso do execve normalmente é ligado ao fork. Após a cópia estar feita o filho chama o execve para substituir seu código binário.
+* exit(): Usamos esta hamada pra indicar que o processo já não é mais necessário.
+* kill(): Envia um sinal ao núcleo sobre uma tarefa.
+* getpid(): Retorna o ProcessIDentifier
+
+No Linux é possível visualizar claramente a hierarquia de processo (uma árvore). Já o windows não diferencia pais e filhos mantendo todos no mesmo nível.
+
+### Threads
+
+>Uma thread é definida como sendo um fluxo de execução independente. Um processo pode conter uma ou mais threads, cada uma executando seu próprio código e compartilhando recursos com as demais threads localizadas no mesmo processo. Cada thread é caracterizada por um código em execução e um pequeno contexto local, o chamado Thread Local Storage (TLS), composto pelos registradores do processador e uma área de pilha em memória, para que a thread possa armazenar variáveis locais e efetuar chamadas de funções.
+
+| Modelo | N:1 | 1:1 | N:M
+|:---:|:---:|:---:|:---:
+| Resumo | N threads do processo mapeados em uma thread de núcleo | Cada thread do processo mapeado em uma thread de núcleo| N threads do processo mapeados em M< N threads de núcleo
+| Implementação | no pocesso (biblioteca| no núcleo | em ambos |
+| Complexidade | baixa | média | alta
+| Custo de gerência | baixo | médio | alto
+| Escalabilidade | alta | baixa | alta
+| Paralelismo entre threads do mesmo processo | não | sim | sim
+| Troca de contexto entre threads do mesmo processo | rápida | lenta | rápida
+| Divisão de recursos entre tarefas | injusta | justa | variável, pois o mapeamento thread->processador é dinâmico.
 
 ## Capítulo 6 - Escalonamento de tarefas
 
-## CApítulo 7 - Tópicos em gestão de tarefas
+## Capítulo 7 - Tópicos em gestão de tarefas
+
+## Capítulo 8 - Comunicação entre tarefas
+
+## Capítulo 9 - Mecanismos de comunicação
+
+## Capítulo 10 - Coordenação entre tarefas
+
+## Capítulo 11 - Mecanismos de Coordenação
+
+## Capítulo 12 - Problemas clássicos
