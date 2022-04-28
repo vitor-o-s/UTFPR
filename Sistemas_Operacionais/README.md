@@ -116,6 +116,8 @@ No Linux é possível visualizar claramente a hierarquia de processo (uma árvor
 
 >Uma thread é definida como sendo um fluxo de execução independente. Um processo pode conter uma ou mais threads, cada uma executando seu próprio código e compartilhando recursos com as demais threads localizadas no mesmo processo. Cada thread é caracterizada por um código em execução e um pequeno contexto local, o chamado Thread Local Storage (TLS), composto pelos registradores do processador e uma área de pilha em memória, para que a thread possa armazenar variáveis locais e efetuar chamadas de funções.
 
+As threads N:1 são vistas pelo kernel como apenas 1, no caso da 1:1 a quantidade de thread existente no processo será mapeada para uma thread de núcleo, por último as threads M:N criam N threads no processo mas apenas M threads no kernel. A tabela a seguir compara 3 tipos de implementação de threads.
+
 | Modelo | N:1 | 1:1 | N:M
 |:---:|:---:|:---:|:---:
 | Resumo | N threads do processo mapeados em uma thread de núcleo | Cada thread do processo mapeado em uma thread de núcleo| N threads do processo mapeados em M< N threads de núcleo
@@ -127,7 +129,35 @@ No Linux é possível visualizar claramente a hierarquia de processo (uma árvor
 | Troca de contexto entre threads do mesmo processo | rápida | lenta | rápida
 | Divisão de recursos entre tarefas | injusta | justa | variável, pois o mapeamento thread->processador é dinâmico.
 
+A escolha entre uma implementação com processos, threads oou mista deve levar alguns pontos em consideração como a troca de contexto,segurança,robustez,compartilhamento de memória e outros.
+
 ## Capítulo 6 - Escalonamento de tarefas
+
+Falando sobre o escalonador (responsável por decidir a ordem de execuçãodas tarefas prontas), podemos ter diversos algoritmos cada um levando em consideração pontos diferentes.Alguns pontos temos que nos atentar são o comportamento temporal da tarefa (tempo real/interativas/lote) e o seu comportamento no uso do processador (CPU-bound/IO-bound).
+É claro que para compararmos algoritmos precisamos escolher um objetivo e uma métrica, neste, o objetivo contudo varia de acordo com o uso do sistema operacional, mas as métricas podem ser utilizadas em todos os casos, sendo elas:
+
+* Tempo de execução/vida:Tempo entre a criação da tarefa e seu encerramento (considera tempo de espera)
+* Tempo de espera: Tempo perdido na fila de tarefas prontas
+* Tempo de resposta: Tempo entre a chegadadeum evento e o resultado imediato de seu processamento
+* Justiça: 2 tarefas prontas com mesmo comportamento e prioridade similares devem ter durações de execução similares
+* Eficiência: Depende principalmente da troca de contexto. Indica o grau de utilização do processador
+
+Devemos saber ainda que existem escalonadores do tipo
+
+* Preemptivos: A tarefa pode perder o processador caso termine seu quantum/ caso execute uma chamada de sistema ou caso ocorra uma interrupção para uma tarefa mais prioritária.
+* Cooperativos: A tarefa só libera o processador caso peça uma E/S, termine de executar ou libere explicitamente o processador.
+
+### Algoritmos de escalonamento
+
+Os algoritmos descritos aqui são a base de algoritmos mais complexos que normalmente são implementados em sistemas reais.
+
+* First-Come, First Served (FCFS): Um algoritmo super simples onde a primeira tarefa a chegar será a primeira a ser executada.
+* Round-Robin (RR): Se adicionarmos a preempção ao FCFS obtemos um escalonador por revezamento (vulgo Round-Robin). O fluxo de execução das tarefas é um pouco mais complexo, caso uma tarefa não se encerre em um quantum ela volta a fila, sendo executada após (caso haja) as tarefas que chegaram antes a fila.
+* Shortest Job First (SJF): O escalonador envia a tarefa mais curta para ser exeutada primeiro, o grande problema é como estimar a duração de uma tarefa? Podemos pensar em um escalonador "inteligente" que aprenderá os padrões de execução de uma tarefa para estimar mas o esalonador deverá estar sempre reaprendendo. Outro problema é se por acaso muitas tarefas curtas chegarem cosntantemente uma tarefa longa jamais será executada (para este problema utilizamos a técnia de envelhecimento de tarefas).
+* Shortest Remaining Time First (SRTF): Esta é uma solução cooperativa. Contudo na versão preemptiva a cada nova  tarefa pronta uma comaração da estimativa é executada passando o controle para a tarefa mais curta (pode ser a atual ou outra), em questão de tempos é uma das melhores mas ainda existe o problema de inanição de tarefas mais longas.
+* PRIOc (Prioridade cooperativa): Cada tarefa possui uma prioridade (# int) associada, neste caso a tarefa de maior prioridade será executa até seu fim (ou até que essa libere explicitamente).
+* PRIOp (Prioridade preemptiva): Quando uma tarefa de maior prioridade se torna disponível para execução o escalonador a entrega para o processador e caso seja uma troca a tarefa atual é levada de volta a situação de pronta.
+* PRIOd (Prioridade dinâmica): Caso o sistema tenha que lidar com muitas tarefas de alta prioridade, o escalonador entregara quase nunca as tarefas de baixa prioridade e portanto para que elas não fiquem inativas com o decorrer do tempo incrementamos suas prioridade (envelhecimento).
 
 ## Capítulo 7 - Tópicos em gestão de tarefas
 
