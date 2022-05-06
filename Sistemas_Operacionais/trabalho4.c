@@ -27,7 +27,7 @@ void* process_a(void* v){
     printf("Iniciando processo A\n");      
     sleep((rand()%4) + 1);        
     printf("Finalizando processo A\n");
-    sem_post(&b);
+    sem_post(&c);
 }
 
 void* process_b(void* v){
@@ -40,10 +40,12 @@ void* process_b(void* v){
 
 void* process_c(void* v){
     sem_wait(&c);
+    sem_wait(&c);
     printf("Iniciando processo C\n");
     sleep((rand()%4)+1);
     printf("Finalizando processo 'C'\n");
     sem_post(&d);
+    sem_post(&e);
 }
 
 
@@ -52,7 +54,6 @@ void* process_d(void* v){
     printf("Iniciando processo D\n");
     sleep((rand()%4)+1);
     printf("Finalizando processo 'D'\n");
-    sem_post(&e);
 }
 
 void* process_e(void* v){
@@ -67,7 +68,7 @@ int main(void){
     pthread_t thread[5];
 
     sem_init(&a,0,1);
-    sem_init(&b,0,0);
+    sem_init(&b,0,1);
     sem_init(&c,0,0);
     sem_init(&d,0,0);
     sem_init(&e,0,0);
@@ -78,9 +79,9 @@ int main(void){
     pthread_create(&thread[3], NULL, &process_d, NULL);
     pthread_create(&thread[4], NULL, &process_e, NULL);
 
-    for(int i = 0; i<5; i++)
-        pthread_join(thread[i],NULL);
-
-    //pthread_kill(thread,'SIGKILL');
+    //for(int i = 0; i<5; i++)
+    //    pthread_join(thread[i],NULL);
+    pthread_exit(0);
+    
     return 0;
 }
