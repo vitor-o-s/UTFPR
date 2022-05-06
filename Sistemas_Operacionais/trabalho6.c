@@ -29,72 +29,115 @@ A solução não deve ter nenhum comentário
 #include <mqueue.h>
 
 #define GAULESES 5
+#define JAVALIS 20
 #define ever ;;
+#define nome "VITOR"
 
-sem_t buffer_cald;
+pthread_mutex_t mutex;
+sem_t full, empty;
+pthread_t tid;
 
-typedef struct messbuf
-{
-  int num_javali;
-} Javali;// messbuf_t;
+typedef struct{
+    int num_javali;
+}Javali;
+
+int mesa[JAVALIS];
+int counter;
 
 
-Javali data;
-Javali *ptr = &data;
-mqd_t fd;
-
-char nome[] = "VITOR";
-int gaules[GAULESES];
-
-void delay(int n){
-  sleep(random() % n);
+void ComeJavali(char nome_thread, int tid){
+    printf("Gaules %c(%d) comendo\n", nome_thread,tid);
 }
 
-void* RetiraJavali(int tid){
+int RetiraJavali(int *j){
+    if(counter > 0){ // When the buffer is not empty remove the item and decrement the counter
+		*j = mesa[(counter-1)];
+        printf("Retirando %d",mesa[(counter-1)]);
+		counter--;
+		return 0;
+	}
+	else { // Error buffer empty
+		return 1;
+	}
+}
+    
 
-    sem_wait(&buffer_cald);
-    mq_receive(fd, (void *)ptr, sizeof(Javali), 0);//(fd, (void *)ptr, sizeof(messbuf_t), 0);
-    return (void*)(intptr_t)fd;
+int ColocaJavalis(int M){
+    if(counter < JAVALIS){ // When the buffer is not full add the item and increment the counter*/
+		mesa[counter] = M;
+        printf("%d",mesa[counter]);
+		counter++;
+        
+		return 0;
+	}
+	else{ // Error the buffer is full
+		return 1;
+	}
 }
 
-void* ComeJavali(Javali j, int tid){
+void* Gaules(void *id){
+    int item;
+    while(1){
+        sem_wait(&full);
+        pthread_mutex_lock(&mutex);
 
-    if (ptr->num_javali == 0)
-    {
-        printf("Gaules %c(%d) acordou o cozinheiro\n", nome[tid], tid);
+        long tidd = (long)id;
+        char nome_thread = nome[tid];
+
+        if(!RetiraJavali(&item)) {
+			ComeJavali(nome_thread, tidd);
+		}
+		else {
+			fprintf(stderr, " Consumer report error condition\n");
+		}
+
+        //int j = RetiraJavali();
+        pthread_mutex_unlock(&mutex);
+        sem_post(&empty);
+        
     }
-    ptr->num_javali--;
-    sem_post(&buffer_cald);
-
-    printf("Gaules %c(%d): Comeu o Javali [%d]\n", nome[tid], tid, (int)ptr->num_javali);
-
-    delay(2);
 }
 
-void* Gaules(void* id){
-    int tid = (long)id;
-    for(ever){
-        Javali j = RetiraJavali(tid);
-        //j = (Javali)(long)temp;
-        ComeJavali(j, tid);
+void* Cozinheiro(){
+    while(1){
+        int M = rand() % 100;
+        sem_wait(&empty);
+        pthread_mutex_lock(&mutex);
+        if(!ColocaJavalis(M)) {
+			printf("producer produced %d\n", M);
+		}
+		else {
+			fprintf(stderr, " Producer report error condition\n");
+		}
+
+        pthread_mutex_unlock(&mutex);
+        sem_post(&full);
     }
+}
+
+void initializeData() {
+	counter = 0; //init buffer
+
+	pthread_mutex_init(&mutex, NULL); //create the mutex lock */
+	sem_init(&full, 0, 0); 	//create the full semaphore and initialize to 0 */
+	sem_init(&empty, 0, JAVALIS); //create the empty semaphore and initialize to BUFFER_SIZE */
 }
 
 int main(void){
-    
-    fd = mq_open("/myqueue", O_RDWR);
 
-    pthread_t gaules[GAULESES];
+    int i;
+    //pthread_t thread[GAULESES];
+    //pthread_t thread
 
-    sem_init(&buffer_cald, 0, 1);
+	initializeData();
 
-    for (long i = 0; i < GAULESES; i++)
-    {
-        pthread_create(&gaules[i], NULL, Gaules, (void *)i);
-    }
+	// Create the producer threads
+	pthread_create(&tid,NULL,Cozinheiro,NULL);
 
-    pthread_exit(NULL);
+    for(i = 1; i <= GAULESES; i++)
+        pthread_create(&tid, NULL, Gaules, NULL);
 
-    sleep(5);
+    sleep(10);
+
     return 0;
 }
