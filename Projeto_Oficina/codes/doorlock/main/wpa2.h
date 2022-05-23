@@ -21,9 +21,9 @@
 #define EXAMPLE_WIFI_SSID "UTFPR-ALUNO"
 #define EXAMPLE_EAP_METHOD 1
 
-#define EXAMPLE_EAP_ID ""
-#define EXAMPLE_EAP_USERNAME ""
-#define EXAMPLE_EAP_PASSWORD ""
+#define EXAMPLE_EAP_ID "a2039869"
+#define EXAMPLE_EAP_USERNAME "a2039869"
+#define EXAMPLE_EAP_PASSWORD "computacao123"
 
 /* FreeRTOS event group to signal when we are connected & ready to make a request */
 static EventGroupHandle_t wifi_event_group;
@@ -145,15 +145,15 @@ static void wpa2_enterprise_example_task(void *pvParameters)
     memset(&ip, 0, sizeof(esp_netif_ip_info_t));
     vTaskDelay(2000 / portTICK_PERIOD_MS);
 
+    ESP_LOGI(TAG_WPA, "~~~~~~~~~~~");
+    ESP_LOGI(TAG_WPA, "IP:"IPSTR, IP2STR(&ip.ip));
+    ESP_LOGI(TAG_WPA, "MASK:"IPSTR, IP2STR(&ip.netmask));
+    ESP_LOGI(TAG_WPA, "GW:"IPSTR, IP2STR(&ip.gw));
+    ESP_LOGI(TAG_WPA, "~~~~~~~~~~~");
     while (1) {
         vTaskDelay(2000 / portTICK_PERIOD_MS);
 
         if (esp_netif_get_ip_info(sta_netif, &ip) == 0) {
-            ESP_LOGI(TAG_WPA, "~~~~~~~~~~~");
-            ESP_LOGI(TAG_WPA, "IP:"IPSTR, IP2STR(&ip.ip));
-            ESP_LOGI(TAG_WPA, "MASK:"IPSTR, IP2STR(&ip.netmask));
-            ESP_LOGI(TAG_WPA, "GW:"IPSTR, IP2STR(&ip.gw));
-            ESP_LOGI(TAG_WPA, "~~~~~~~~~~~");
         }
     }
 }

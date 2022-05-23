@@ -20,6 +20,9 @@
     "socket.h": "c",
     "mqtt.h": "c",
     "cjson.h": "c",
-    "string": "c"
+    "string": "c",
+    "err.h": "c",
+    "esp_netif.h": "c",
+    "supplicant_opt.h": "c"
   }
 }
