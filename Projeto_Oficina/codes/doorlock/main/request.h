@@ -18,7 +18,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_tls.h"
-#include "/home/prando/esp/esp-idf/components/wpa_supplicant/src/utils/base64.h"
+#include "/home/vitor/esp/esp-idf/components/wpa_supplicant/src/utils/base64.h"
 
 #include "cJSON.h"
 
@@ -172,10 +172,12 @@ static void https_perform_post(uint8_t *buf)
   out = cJSON_Print(body);
 */
   esp_http_client_set_method(client, HTTP_METHOD_POST);
-  esp_http_client_set_header(client, "Content-Type", "image/x-windows-bmp");
-  esp_http_client_set_header(client, "Content-Length", "1440054");
+  esp_http_client_set_header(client, "Content-Type", "text/*");
+  //esp_http_client_set_header(client, "cont", "");
+  esp_http_client_set_header(client, "Content-Length", "648889"); //1440054 //1297778 rgb566
+  esp_http_client_set_header(client, "Content-Transfer-Encoding", "BASE64");
   ESP_LOGW(POST_TAG, "Passou do set header");
-  esp_http_client_set_post_field(client, (const char *)buf, 1440054);
+  esp_http_client_set_post_field(client, (const char *)buf, 648889);
   ESP_LOGW(POST_TAG, "Passou do set field");
 
   esp_err_t err = esp_http_client_perform(client);
@@ -190,7 +192,6 @@ static void https_perform_post(uint8_t *buf)
   {
     ESP_LOGE(POST_TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
   }
-
   ESP_LOGW(HTTP_TAG, "clear");
   esp_http_client_close(client);
   esp_http_client_cleanup(client);
