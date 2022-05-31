@@ -25,13 +25,12 @@ A solução não deve ter nenhum comentário
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <sys/stat.h>
-#include <mqueue.h>
 
 #define GAULESES 5
 #define JAVALIS 20
 #define ever ;;
-#define nome "VITOR"
+
+char NOME[] = {'V', 'I', 'T', 'O', 'R'};
 
 pthread_mutex_t mutex;
 sem_t full, empty;
@@ -52,7 +51,7 @@ void ComeJavali(char nome_thread, int tid){
 int RetiraJavali(int *j){
     if(counter > 0){ // When the buffer is not empty remove the item and decrement the counter
 		*j = mesa[(counter-1)];
-        printf("Retirando %d",mesa[(counter-1)]);
+        //printf("Retirando %d",mesa[(counter-1)]);
 		counter--;
 		return 0;
 	}
@@ -65,7 +64,7 @@ int RetiraJavali(int *j){
 int ColocaJavalis(int M){
     if(counter < JAVALIS){ // When the buffer is not full add the item and increment the counter*/
 		mesa[counter] = M;
-        printf("%d",mesa[counter]);
+        //printf("%d",mesa[counter]);
 		counter++;
         
 		return 0;
@@ -77,18 +76,20 @@ int ColocaJavalis(int M){
 
 void* Gaules(void *id){
     int item;
+    long tidd = (long)id;
     while(1){
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
 
-        long tidd = (long)id;
-        char nome_thread = nome[tid];
+        
+        char nome_thread = NOME[tidd];
 
         if(!RetiraJavali(&item)) {
+            //printf("Chegamo aqui\n");
 			ComeJavali(nome_thread, tidd);
 		}
 		else {
-			fprintf(stderr, " Consumer report error condition\n");
+			printf("Gaules %c(%ld) acordou o cozinheiro\n", nome_thread, tid);
 		}
 
         //int j = RetiraJavali();
@@ -104,11 +105,11 @@ void* Cozinheiro(){
         sem_wait(&empty);
         pthread_mutex_lock(&mutex);
         if(!ColocaJavalis(M)) {
-			printf("producer produced %d\n", M);
+			printf("Cozinheiro colocou javali na mesa \n");
 		}
-		else {
+		/*else {
 			fprintf(stderr, " Producer report error condition\n");
-		}
+		}*/
 
         pthread_mutex_unlock(&mutex);
         sem_post(&full);
@@ -126,16 +127,16 @@ void initializeData() {
 int main(void){
 
     int i;
-    //pthread_t thread[GAULESES];
-    //pthread_t thread
+    pthread_t gauleses[GAULESES];
+    pthread_t cozinheiro;
 
 	initializeData();
 
 	// Create the producer threads
-	pthread_create(&tid,NULL,Cozinheiro,NULL);
+	pthread_create(&cozinheiro, NULL, Cozinheiro, NULL);
 
-    for(i = 1; i <= GAULESES; i++)
-        pthread_create(&tid, NULL, Gaules, NULL);
+    for(i = 1; i < GAULESES; i++)
+        pthread_create(&gauleses[i], NULL, Gaules, (void *)(intptr_t)i);
 
     sleep(10);
 
