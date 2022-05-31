@@ -15,9 +15,8 @@ export class S3Service {
     const requestS3 = {
       Bucket: this.bucketName,
       Key: data.id,
-      Body: data.file,
-      // Body: Buffer.from(data.file).toString("base64"),
-      ContentEncoding: "N/A",
+      Body: Buffer.from(data.file.replace(/^data:image\/\w+;base64,/, ""), "base64"),
+      ContentEncoding: "base64",
       ContentType: data.contentType
     };
 

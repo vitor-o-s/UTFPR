@@ -18,15 +18,12 @@ export class NewAccessRequestFunction extends FunctionAbstract<Request, Response
   static instance: NewAccessRequestFunction;
 
   protected buildRequest(request: HttpRequestWrapper<string>): Request {
-    console.log("request body", request.body);
-
     return request.body;
   }
 
   protected async execute(fileEncoded: Request): Promise<CustomResponse<Response>> {
     const fileKeyId = v4();
-
-    const fileContentType = "*/*";
+    const fileContentType = "image/jpeg";
 
     const s3 = new S3Service(facesBucket);
     const s3Result = await s3.uploadImage({ id: fileKeyId, file: fileEncoded, contentType: fileContentType });
