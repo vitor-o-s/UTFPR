@@ -186,7 +186,7 @@ static void https_perform_post(uint8_t *buf)
   ESP_LOGW(POST_TAG, "Passou do set field");
 
   esp_err_t err = esp_http_client_perform(client);
-  if (err == ESP_OK)
+if (err == ESP_OK)
   {
     ESP_LOGI(POST_TAG, "HTTP POST Status = %d, content_length = %d",
              esp_http_client_get_status_code(client),
