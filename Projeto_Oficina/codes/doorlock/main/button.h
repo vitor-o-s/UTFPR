@@ -52,7 +52,7 @@ static void gpio_task_example(void *arg)
       ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
 
       uint8_t *out = NULL;
-      size_t out_size;
+      size_t out_size, out_size2;
 
       frame2bmp(pic, &out, &out_size);
       esp_camera_fb_return(pic);
@@ -60,9 +60,11 @@ static void gpio_task_example(void *arg)
       printf("%s\n\r", out);
       printf("%d\n\r", (int)out_size);
 
-      uint8_t *out_base_64 =  (uint8_t *)base64_encode(out, pic->len, out_size);
-    /*  while(out_size) {
-        printf("%02x", *out++);
+      uint8_t *out_base_64 =  (uint8_t *)base64_encode(out, pic->len, &out_size2);
+      printf("Convertido\n");
+      printf("%d\n\r", (int)out_size2);
+      /*while(out_size) {
+        printf("%c", *out_base_64++);
         out_size--;
       }*/
       printf("\n\r");
