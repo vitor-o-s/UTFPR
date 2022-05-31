@@ -21,8 +21,8 @@
 #define EXAMPLE_WIFI_SSID "UTFPR-ALUNO"
 #define EXAMPLE_EAP_METHOD 1
 
-#define EXAMPLE_EAP_ID "a203"
-#define EXAMPLE_EAP_USERNAME "a203"
+#define EXAMPLE_EAP_ID "a20"
+#define EXAMPLE_EAP_USERNAME "a20"
 #define EXAMPLE_EAP_PASSWORD ""
 
 /* FreeRTOS event group to signal when we are connected & ready to make a request */

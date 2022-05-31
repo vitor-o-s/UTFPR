@@ -174,10 +174,15 @@ static void https_perform_post(uint8_t *buf)
   esp_http_client_set_method(client, HTTP_METHOD_POST);
   esp_http_client_set_header(client, "Content-Type", "text/*");
   //esp_http_client_set_header(client, "cont", "");
-  esp_http_client_set_header(client, "Content-Length", "648889"); //1440054 //1297778 rgb566
+  //648889 GRAY;SVGA
+  //1440054
+  //1297778 rgb566;svga
+  //114205 RGB565;HQVGA
+  //207645 RGB565;QVGA
+  esp_http_client_set_header(client, "Content-Length", "207645"); 
   esp_http_client_set_header(client, "Content-Transfer-Encoding", "BASE64");
   ESP_LOGW(POST_TAG, "Passou do set header");
-  esp_http_client_set_post_field(client, (const char *)buf, 648889);
+  esp_http_client_set_post_field(client, (const char *)buf, 207645);
   ESP_LOGW(POST_TAG, "Passou do set field");
 
   esp_err_t err = esp_http_client_perform(client);
