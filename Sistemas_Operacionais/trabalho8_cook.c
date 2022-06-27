@@ -29,7 +29,7 @@ int main(void){
     fd[0] = open("retirar", O_RDONLY);
     fd[1] = open("servir", O_WRONLY);
     jav.numJavalis = JAVALIS;
-    printf("Cozinheiro encheu o caldeirão com %d javalis e foi nanar\n", jav.numJavalis);
+    printf("Cozinheiro reabasteceu os javalis e dormiu\n");
     
     write(fd[1], &jav, sizeof(pipe1_t)); //Avisa que encheu
     while(1){
@@ -37,7 +37,7 @@ int main(void){
         if(pedido.controle == 'E'){
             //printf("Entrei");
             jav.numJavalis = JAVALIS; 
-            printf("Cozinheiro encheu o caldeirão com %d javalis e foi nanar.\n", jav.numJavalis);
+            printf("Cozinheiro reabasteceu os javalis e dormiu\n");
             write(fd[1], &jav, sizeof(pipe1_t)); //Avisa que encheu
             read(fd[0], &pedido, sizeof(pipe2_t));
         }

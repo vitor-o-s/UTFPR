@@ -21,7 +21,7 @@ void *Cozinheiro(){
     while(1){
         sem_wait(&controle->sem_Coz);
         controle->numJavalis = JAVALIS;
-        printf("Cozinheiro reabasteceu os javalis e dormiu\n", controle->numJavalis);
+        printf("Cozinheiro reabasteceu os javalis e dormiu\n");
         sem_post(&controle->sem_Retira);
     }
     pthread_exit(NULL);
@@ -40,7 +40,7 @@ int main(void){
     sem_init(&controle->sem_mesa, 1, 1);
 
     controle->numJavalis = JAVALIS;
-    printf("Cozinheiro reabasteceu os javalis e dormiu\n", controle->numJavalis);
+    printf("Cozinheiro reabasteceu os javalis e dormiu\n");
 
     pthread_t cozinheiro;
 
