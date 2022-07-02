@@ -22,7 +22,7 @@ export class NewAccessRequestFunction extends FunctionAbstract<Request, Response
   }
 
   protected async execute(fileEncoded: Request): Promise<CustomResponse<Response>> {
-    const fileKeyId = v4();
+    const fileKeyId = `${v4()}.jpeg`;
     const fileContentType = "image/jpeg";
 
     const s3 = new S3Service(facesBucket);

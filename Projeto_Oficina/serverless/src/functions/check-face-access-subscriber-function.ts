@@ -33,13 +33,17 @@ export class CheckFaceAccessSubscriberFunction extends FunctionSubscriberAbstrac
 
     const rekognition = new RekognitionService();
 
-    const faceMatch = await rekognition.searchFace(file.Body as string);
+    const faceMatch = await rekognition.searchFace(fileKeyId);
+
+    console.log({ faceMatch });
 
     const IoT = new IoTService(changeDoorStatusTopic);
 
-    const status = faceMatch ? DoorStatusEnum.OPEN : DoorStatusEnum.CLOSE;
+    const message = faceMatch
+      ? { status: DoorStatusEnum.OPEN, name: faceMatch.Name, confidence: faceMatch.Confidence }
+      : { status: DoorStatusEnum.CLOSE };
 
-    await IoT.publishMessage({ status });
+    await IoT.publishMessage(message);
   }
 
   static getInstance() {
