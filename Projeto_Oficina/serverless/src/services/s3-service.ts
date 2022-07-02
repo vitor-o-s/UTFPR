@@ -45,7 +45,8 @@ export class S3Service {
   }
 
   async createSignedUrl(fileName: string, operation: string): Promise<{ url: string }> {
-    const signedUrlExpireSeconds = 60 * 2;
+    const ONE_DAY_IN_SECONDS = 60 * 2 * 60 * 24;
+    const signedUrlExpireSeconds = ONE_DAY_IN_SECONDS;
 
     const url = this.s3.getSignedUrl(operation, {
       Bucket: this.bucketName,

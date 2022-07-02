@@ -27,7 +27,8 @@ export class TelegramService {
     const { data } = await this.api.get<ResultMessage>("/sendMessage", {
       data: {
         chat_id: this.chatId,
-        text
+        text,
+        parse_mode: "HTML"
       }
     });
 

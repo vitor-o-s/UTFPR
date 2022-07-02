@@ -1,3 +1,4 @@
+import { S3Service } from "@services/s3-service";
 import { TelegramService } from "@services/telegram-service";
 
 import { FunctionSubscriberAbstract } from "./abstracts/function-subscriber-abstract";
@@ -20,9 +21,11 @@ export class NotifyUserSubscriberFunction extends FunctionSubscriberAbstract<Mes
 
   protected async execute({ fileKeyId }: Message): Promise<void> {
     const telegramService = new TelegramService();
-    const photoUrl = `https://${facesBucket}.s3.us-east-1.amazonaws.com/${fileKeyId}`;
+    const s3Service = new S3Service(facesBucket);
 
-    const message = `Nova requisição de entrada às ${new Date()} \n visualize a foto ${photoUrl}`;
+    const { url: photoUrl } = await s3Service.createSignedUrl(fileKeyId, "getObject");
+
+    const message = `Nova requisição de entrada às ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} \n visualize a foto <a href='${photoUrl}'>clicando aqui</a>`;
 
     console.log("Enviando mensagem para telegram", message);
 
