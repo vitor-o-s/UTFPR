@@ -2,3 +2,5 @@
 *.o
 .venv/
 venv/
+
+.vscode
