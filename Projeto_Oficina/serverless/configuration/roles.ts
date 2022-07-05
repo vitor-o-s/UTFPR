@@ -11,6 +11,11 @@ export const serverlessRoles = [
   },
   {
     Effect: "Allow",
+    Action: ["rekognition:*"],
+    Resource: "*"
+  },
+  {
+    Effect: "Allow",
     Action: ["s3:GetObject", "s3:ListBucket", "s3:PutObject"],
     Resource: "*"
   },

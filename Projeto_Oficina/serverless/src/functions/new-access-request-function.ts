@@ -10,9 +10,7 @@ import { FunctionAbstract } from "./abstracts/function-abstract";
 
 import { noContent } from "@helpers/response";
 
-type Request = {
-  fileEncoded: string;
-};
+type Request = string;
 
 type Response = any;
 
@@ -20,11 +18,11 @@ export class NewAccessRequestFunction extends FunctionAbstract<Request, Response
   static instance: NewAccessRequestFunction;
 
   protected buildRequest(request: HttpRequestWrapper<string>): Request {
-    return JSON.parse(request.body);
+    return request.body;
   }
 
-  protected async execute({ fileEncoded }: Request): Promise<CustomResponse<Response>> {
-    const fileKeyId = v4();
+  protected async execute(fileEncoded: Request): Promise<CustomResponse<Response>> {
+    const fileKeyId = `${v4()}.jpeg`;
     const fileContentType = "image/jpeg";
 
     const s3 = new S3Service(facesBucket);

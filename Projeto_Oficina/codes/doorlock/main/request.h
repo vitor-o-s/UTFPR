@@ -18,6 +18,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_tls.h"
+#include "/home/vitor/esp/esp-idf/components/wpa_supplicant/src/utils/base64.h"
 
 #include "cJSON.h"
 
@@ -161,21 +162,31 @@ static void https_perform_post(uint8_t *buf)
   ESP_LOGW(POST_TAG, "Enviando POST");
 
   // gerando body json para API
-  cJSON *body;
-  char *out;
+ // cJSON *body;
+  //char *out;
 
-  body = cJSON_CreateObject();
+  /*body = cJSON_CreateObject();
 
   cJSON_AddItemToObject(body, "fileEncoded", cJSON_CreateString((const char *)buf));
 
   out = cJSON_Print(body);
-
+*/
   esp_http_client_set_method(client, HTTP_METHOD_POST);
-  esp_http_client_set_header(client, "Content-Type", "application/json");
-  esp_http_client_set_post_field(client, (const char *)out, strlen((const char *)out));
+  esp_http_client_set_header(client, "Content-Type", "text/*");
+  //esp_http_client_set_header(client, "cont", "");
+  //648889 GRAY;SVGA
+  //1440054
+  //1297778 rgb566;svga
+  //114205 RGB565;HQVGA
+  //207645 RGB565;QVGA
+  esp_http_client_set_header(client, "Content-Length", "207645"); 
+  esp_http_client_set_header(client, "Content-Transfer-Encoding", "BASE64");
+  ESP_LOGW(POST_TAG, "Passou do set header");
+  esp_http_client_set_post_field(client, (const char *)buf, 207645);
+  ESP_LOGW(POST_TAG, "Passou do set field");
 
   esp_err_t err = esp_http_client_perform(client);
-  if (err == ESP_OK)
+if (err == ESP_OK)
   {
     ESP_LOGI(POST_TAG, "HTTP POST Status = %d, content_length = %d",
              esp_http_client_get_status_code(client),
@@ -186,7 +197,6 @@ static void https_perform_post(uint8_t *buf)
   {
     ESP_LOGE(POST_TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
   }
-
   ESP_LOGW(HTTP_TAG, "clear");
   esp_http_client_close(client);
   esp_http_client_cleanup(client);

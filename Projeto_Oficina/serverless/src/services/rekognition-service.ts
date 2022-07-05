@@ -1,26 +1,25 @@
-import { Rekognition } from "aws-sdk";
+import { RekognitionClient, DetectCustomLabelsCommand } from "@aws-sdk/client-rekognition";
+
+import { facesBucket } from "configuration";
 
 export class RekognitionService {
-  private rekognition: Rekognition;
+  private client: RekognitionClient;
 
   constructor() {
-    this.rekognition = new Rekognition();
+    this.client = new RekognitionClient({});
   }
 
-  async searchFace(encodedPhoto: string) {
-    const searchResult = await this.rekognition
-      .searchFacesByImage({
-        CollectionId: process.env.REKOGNITION_COLLECTION_ID!,
-        FaceMatchThreshold: 70, // set minumum match in image send
-        Image: {
-          Bytes: encodedPhoto
-        },
-        MaxFaces: 1 // set the number face detect in image send
-      })
-      .promise();
+  async searchFace(name: string) {
+    const command = new DetectCustomLabelsCommand({
+      Image: { S3Object: { Bucket: facesBucket, Name: name } },
+      ProjectVersionArn: process.env.REKOGNITION_COLLECTION_ID
+    });
 
-    const { FaceMatches } = searchResult;
+    console.log({ command });
 
-    return FaceMatches ? FaceMatches[0] : undefined;
+    const response = await this.client.send(command);
+    console.log({ response });
+
+    return response.CustomLabels ? response.CustomLabels[0] : undefined;
   }
 }

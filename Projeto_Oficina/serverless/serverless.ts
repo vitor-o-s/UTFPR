@@ -1,6 +1,6 @@
 import type { AWS, AwsLambdaEnvironment } from "@serverless/typescript";
 
-import { photoTopic, serverlessResources, serverlessRoles } from "./configuration";
+import { changeDoorStatusTopic, photoTopic, serverlessResources, serverlessRoles } from "./configuration";
 
 const service = "oficina-integracao";
 
@@ -24,6 +24,16 @@ const configuration: AWS = {
         {
           sns: {
             arn: `arn:aws:sns:\${aws:region}:\${aws:accountId}:${photoTopic}`
+          }
+        }
+      ]
+    },
+    "notify-user-check-subscriber": {
+      handler: "src/handlers.notifyUserCheckFaceAccessStatus",
+      events: [
+        {
+          sns: {
+            arn: `arn:aws:sns:\${aws:region}:\${aws:accountId}:${changeDoorStatusTopic}`
           }
         }
       ]

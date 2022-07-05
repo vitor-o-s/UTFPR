@@ -22,9 +22,7 @@
 #define GPIO_INPUT_IO_0 15
 #define GPIO_INPUT_PIN_SEL ((1ULL << GPIO_INPUT_IO_0))
 #define ESP_INTR_FLAG_DEFAULT 0
-#define EVER \
-  ;          \
-  ;
+#define EVER ;;
 
 static xQueueHandle gpio_evt_queue = NULL;
 
@@ -52,19 +50,28 @@ static void gpio_task_example(void *arg)
 
       // use pic->buf to access the image
       ESP_LOGI(TAG_CAM, "Picture taken! Its size was: %zu bytes", pic->len);
-      esp_camera_fb_return(pic);
 
       uint8_t *out = NULL;
-      uint8_t out_size;
+      size_t out_size, out_size2;
 
       frame2bmp(pic, &out, &out_size);
+      esp_camera_fb_return(pic);
 
       printf("%s\n\r", out);
-      // uint8_t *base_64 = get_base64(pic);
+      printf("%d\n\r", (int)out_size);
 
+      uint8_t *out_base_64 =  (uint8_t *)base64_encode(out, pic->len, &out_size2);
+      printf("Convertido\n");
+      printf("%d\n\r", (int)out_size2);
+      /*while(out_size) {
+        printf("%c", *out_base_64++);
+        out_size--;
+      }*/
+      printf("\n\r");
+      // uint8_t *base_64 = get_base64(pic);
       // fazer requisição http para o servidor
       // http_post(pic->buf);
-      http_post(out);
+      http_post(out_base_64);
 
       printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
       gpio_set_intr_type(GPIO_INPUT_IO_0, GPIO_INTR_NEGEDGE);
