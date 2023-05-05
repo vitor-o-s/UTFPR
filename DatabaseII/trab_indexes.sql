@@ -23,7 +23,7 @@ FOREIGN KEY (Monitor) REFERENCES Aluno(RA)
 
 
 CREATE TABLE Matricula(
-RA DECIMAL(8) NOT NULL,
+RA DECIMAL(8) NOT NULL, -- O que acontece no insert?
 Sigla CHAR(7) NOT NULL,
 Ano CHAR(4) NOT NULL,
 Semestre CHAR(1) NOT NULL,
@@ -191,17 +191,22 @@ CREATE UNIQUE INDEX IdxAlunoNNI ON Aluno (Nome, NomeMae, Idade);
  -- pois a consulta não especifica os valores das outras colunas (NomeMae e Idade) que também fazem parte do índice. 
  -- O SGBD pode optar por não utilizar o índice se considerar que a utilização do mesmo não traria ganhos significativos de desempenho
  -- na busca dos registros desejados.
+ 
 ------------------- Q3
 -- Crie índices e mostre exemplos de consultas (resultados e explain) que usam os seguintes tipos de acessos:
 -- a) Sequential Scan
+SELECT * FROM MATRICULA LIMIT 10; 
 -- b) Bitmap Index Scan
+
 -- c) Index Scan
+
 -- d) Index-Only Scan
+
 -- e) Multi-Index Scan
 
 ------------------- Q4 
 -- Faça consutas com junções entre as tabelas e mostre o desempenho criando-se índices para cada chave estrangeira.
-
+SELECT A.NOME, M.NotaFIM FROM ALUNO A JOIN Matricula M WHERE A.RA = M.RA
 ------------------- Q5
 -- Utilize um índice bitmap para o período e mostre-o em uso nas consultas
 
