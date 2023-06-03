@@ -93,7 +93,7 @@ BEGIN
         NEW.lotacao = 'Médio';
     ELSIF NEW.numero_funcionarios >= 0.5 * NEW.max_mesas AND NEW.numero_funcionarios < 0.8 * NEW.max_mesas THEN
         NEW.lotacao = 'Parcialmente Cheio';
-    ELSIF NEW.numero_funcionarios >= 0.8 * NEW.max_mesas AND NEW.numero_funcionarios <= 1.0 * NEW.max_mesas THEN
+    ELSIF NEW.numero_funcionarios >= 0.8 * NEW.max_mesas AND NEW.numero_funcionarios < 1.0 * NEW.max_mesas THEN
         NEW.lotacao = 'Cheio';
 	ELSE
 		NEW.lotacao = 'Esgotado';
