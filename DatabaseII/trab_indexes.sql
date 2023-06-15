@@ -324,6 +324,7 @@ EXPLAIN SELECT periodo FROM ALUNO WHERE Periodo = 9 AND Estado = 'SP';
 
 -- e) Multi-Index Scan
 EXPLAIN ANALYZE SELECT nome, ra FROM Aluno WHERE nome = 'fkMqaGlGTi' AND ra = 79; -- Confirmar com Ives sobre esse
+-- fazer em matricula no ra e no nome_disciplina
 
 
 ------------------- Q4 

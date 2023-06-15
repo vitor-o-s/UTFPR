@@ -1,6 +1,5 @@
 -- DROP TABLE Departamento CASCADE;
 -- DROP TABLE Funcionario CASCADE;
--- Validar com Ives DDL
 CREATE TABLE Departamento (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -11,7 +10,7 @@ CREATE TABLE Departamento (
 
 CREATE TABLE Funcionario (
     id SERIAL PRIMARY KEY,
-    cpf VARCHAR(14) NOT NULL,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
     nome VARCHAR(100) NOT NULL,
     data_reg DATE NOT NULL,
     id_dep INTEGER REFERENCES Departamento (id)
