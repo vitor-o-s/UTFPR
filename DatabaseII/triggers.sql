@@ -1,3 +1,4 @@
+-- Feito por Andrea e Vitor
 -- DROP TABLE Departamento CASCADE;
 -- DROP TABLE Funcionario CASCADE;
 CREATE TABLE Departamento (
