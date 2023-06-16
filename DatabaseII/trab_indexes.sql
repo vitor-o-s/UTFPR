@@ -1,6 +1,7 @@
+-- Trabalho feito por Andrea e Vitor
 -- DROP TABLE IF EXISTS Aluno CASCADE;
 CREATE TABLE IF NOT EXISTS Aluno(
-RA INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL CONSTRAINT RegistroAcademico PRIMARY KEY, -- UNIQUE/ GARANTIDO por primary key -- AUTO INCREMENT ? SERIAL/IDENTITY
+RA INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL CONSTRAINT RegistroAcademico PRIMARY KEY,
 Nome VARCHAR(50) NOT NULL,
 DataNasc DATE NOT NULL,
 -- Idade DECIMAL(3), -- Não atende a 2FN
@@ -305,8 +306,7 @@ EXPLAIN SELECT * FROM Matricula WHERE sigla = 'N7I8YFM';
 CREATE EXTENSION btree_gin;
 CREATE INDEX IdxDept ON Discip USING gin (Depto);
 ANALYZE Discip;
-EXPLAIN 
-SELECT * FROM Discip WHERE Depto = 'DALET';
+EXPLAIN SELECT * FROM Discip WHERE Depto = 'DALET';
 
 -- c) Index Scan
 ANALYZE ALUNO;
@@ -323,8 +323,15 @@ EXPLAIN SELECT periodo FROM ALUNO WHERE Periodo = 9 AND Estado = 'SP';
 
 
 -- e) Multi-Index Scan
-EXPLAIN ANALYZE SELECT nome, ra FROM Aluno WHERE nome = 'fkMqaGlGTi' AND ra = 79; -- Confirmar com Ives sobre esse
--- fazer em matricula no ra e no nome_disciplina
+EXPLAIN ANALYSE  SELECT A.RA, A.Nome, M.Ano, M.Semestre, M.CodTurma FROM Aluno A NATURAL JOIN Matricula M WHERE RA = 8587;
+-- "Nested Loop  (cost=0.57..12.73 rows=5 width=27) (actual time=0.016..0.019 rows=5 loops=1)"
+-- "  ->  Index Scan using registroacademico on aluno a  (cost=0.29..8.30 rows=1 width=15) (actual time=0.010..0.011 rows=1 loops=1)"
+-- "        Index Cond: (ra = 8587)"
+-- "  ->  Index Only Scan using matricula_pkey on matricula m  (cost=0.29..4.37 rows=5 width=16) (actual time=0.004..0.005 rows=5 loops=1)"
+-- "        Index Cond: (ra = 8587)"
+-- "        Heap Fetches: 0"
+-- "Planning Time: 0.117 ms"
+-- "Execution Time: 0.037 ms"
 
 
 ------------------- Q4 
