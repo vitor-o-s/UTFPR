@@ -1,44 +1,64 @@
+-- DROP TABLE IF EXISTS FUNCIONARIO;
 CREATE TABLE Funcionario (
     cod_servidor SERIAL PRIMARY KEY NOT NULL,
     nome_servidor VARCHAR(200) NOT NULL,
     tel_servidor VARCHAR(9),
-	email_servidor VARCHAR(100)
+    email_servidor VARCHAR(100)
 );
-DROP TABLE Usuario;
+
+-- DROP TABLE IF EXISTS Usuario;
 CREATE TABLE Usuario (
     cpf VARCHAR(11) PRIMARY KEY NOT NULL,
     nome_usuario VARCHAR(200) NOT NULL,
     tel_usuario VARCHAR(9) NOT NULL,
-	email_usuario VARCHAR(100)
+    email_usuario VARCHAR(100)
 );
+
+-- DROP TABLE IF EXISTS Autor;
 CREATE TABLE Autor (
     cod_autor SERIAL PRIMARY KEY NOT NULL,
     nome_autor VARCHAR(200) NOT NULL
 );
+
+-- DROP TABLE IF EXISTS Editora;
 CREATE TABLE Editora (
     cod_editora SERIAL PRIMARY KEY NOT NULL,
     nome_editora VARCHAR(50) NOT NULL,
-	email_editora VARCHAR(100)
+    email_editora VARCHAR(100)
 );
+
+-- DROP TABLE IF EXISTS Livro;
 CREATE TABLE Livro (
     isbn VARCHAR(13),
-	cod_livro SERIAL PRIMARY KEY NOT NULL,
-	disponivel BOOLEAN NOT NULL,
+    cod_livro SERIAL PRIMARY KEY NOT NULL,
+    disponivel BOOLEAN NOT NULL,
     nome_livro VARCHAR(200) NOT NULL,
-	genero VARCHAR(20),
-	nome_autor VARCHAR(200) NOT NULL,
-	cod_autor_livro SERIAL NOT NULL,
-	cod_editora_livro SERIAL NOT NULL
+    genero VARCHAR(20),
+    nome_autor VARCHAR(200) NOT NULL,
+    cod_autor_livro SERIAL NOT NULL,
+    cod_editora_livro SERIAL NOT NULL
 );
+
+-- DROP TABLE IF EXISTS Emprestimo;
 CREATE TABLE Emprestimo (
     cod_emp SERIAL PRIMARY KEY NOT NULL,
     data_emp DATE NOT NULL,
-	data_venc DATE NOT NULL,
-	status INTEGER NOT NULL, -- 1 ATIVO 0 INATIVO
-	multa NUMERIC,
-	cpf_usuario VARCHAR(11) NOT NULL,
-	cod_livro_emprestimo SERIAL NOT NULL
+    data_venc DATE NOT NULL,
+    status INTEGER NOT NULL, -- 1 ATIVO 0 INATIVO
+    multa NUMERIC,
+    cpf_usuario VARCHAR(11) NOT NULL,
+    cod_livro_emprestimo SERIAL NOT NULL
 );
+
+-- DROP TABLE IF EXISTS Escreve;
+CREATE TABLE Escreve (
+    cod_autor SERIAL,
+    cod_livro SERIAL,
+    CONSTRAINT PK_escreve PRIMARY KEY (cod_autor, cod_livro),
+    CONSTRAINT FK_livro FOREIGN KEY (cod_livro) REFERENCES livro (cod_livro),
+    CONSTRAINT FK_autor FOREIGN KEY (cod_autor) REFERENCES Autor (cod_autor)
+);
+
 ALTER TABLE Livro
 ADD CONSTRAINT cod_autor
 FOREIGN KEY (cod_autor_livro)
@@ -58,6 +78,9 @@ ALTER TABLE Emprestimo
 ADD CONSTRAINT cod_livro_emprestimo
 FOREIGN KEY (cod_livro_emprestimo)
 REFERENCES Livro (cod_livro);
+
+
+--- Procedure para inserir livro/autor
 
 ------------------------------------------------------
 ---------------------- TRIGGERS ----------------------
