@@ -241,12 +241,14 @@ EXPLAIN SELECT * FROM Livro WHERE genero = 'Genero 36';
 -----------------------------------------------------
 
 CREATE OR REPLACE VIEW EmprestimoGenero AS
-SELECT count(*), genero FROM Emprestimo GROUP BY genero ORDER BY 1;
+SELECT count(e.*), l.genero FROM Emprestimo e NATURAL JOIN Livro l GROUP BY l.genero ORDER BY 1;
 
 CREATE OR REPLACE VIEW LivrosMaisEmprestados AS
-SELECT count(e.cod_livro_emprestimo), l.nome_livro FROM Emprestimo e JOIN  Livro l ON e.cod_livro_emprestimo = l.isbn GROUP BY cod_livro_emprestimo ORDER BY 1;
+SELECT count(e.*) FROM Emprestimo e NATURAL JOIN  Livro l GROUP BY l.isbn ORDER BY 1;
 
 CREATE OR REPLACE VIEW MaiorDevedor AS
-SELECT cpf_usuario, EXTRACT(DAY FROM AGE(CURRENT_DATE, data_venc)) AS valorMulta
-FROM Emprestimo
-WHERE atraso = TRUE;
+SELECT U.nome_pessoa AS MaioresMultas, e.multa 
+FROM Emprestimo e NATURAL JOIN Usuario u
+WHERE e.status = 1;
+
+-- EXTRACT(DAY FROM AGE(CURRENT_DATE, data_venc))
