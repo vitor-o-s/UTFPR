@@ -1,83 +1,71 @@
--- DROP TABLE IF EXISTS FUNCIONARIO;
+-- DROP TABLE IF EXISTS Pessoa CASCADE;
+CREATE TABLE Pessoa(
+    cod_pessoa INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL CONSTRAINT cod_pessoa PRIMARY KEY,
+    nome_pessoa VARCHAR (200) NOT NULL 
+);
+
+-- DROP TABLE IF EXISTS FUNCIONARIO CASCADE;
 CREATE TABLE Funcionario (
-    cod_servidor SERIAL PRIMARY KEY NOT NULL,
-    nome_servidor VARCHAR(200) NOT NULL,
     tel_servidor VARCHAR(9),
-    email_servidor VARCHAR(100)
-);
+    email_servidor VARCHAR(100) NOT NULL,
+	CONSTRAINT cod_funcionario PRIMARY KEY (cod_pessoa)
+) INHERITS(Pessoa);
 
--- DROP TABLE IF EXISTS Usuario;
+-- DROP TABLE IF EXISTS Usuario CASCADE;
 CREATE TABLE Usuario (
-    cpf VARCHAR(11) PRIMARY KEY NOT NULL,
-    nome_usuario VARCHAR(200) NOT NULL,
+    cpf VARCHAR(11) UNIQUE NOT NULL,
     tel_usuario VARCHAR(9) NOT NULL,
-    email_usuario VARCHAR(100)
-);
+    email_usuario VARCHAR(100),
+	CONSTRAINT cod_usuario PRIMARY KEY (cod_pessoa)
+) INHERITS(Pessoa);
 
--- DROP TABLE IF EXISTS Autor;
+-- DROP TABLE IF EXISTS Autor CASCADE;
 CREATE TABLE Autor (
-    cod_autor SERIAL PRIMARY KEY NOT NULL,
-    nome_autor VARCHAR(200) NOT NULL
-);
+	CONSTRAINT cod_autor PRIMARY KEY (cod_pessoa)
+) INHERITS(Pessoa);
 
--- DROP TABLE IF EXISTS Editora;
+-- DROP TABLE IF EXISTS Editora CASCADE;
 CREATE TABLE Editora (
-    cod_editora SERIAL PRIMARY KEY NOT NULL,
+    cod_editora INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL CONSTRAINT cod_editora PRIMARY KEY,
     nome_editora VARCHAR(50) NOT NULL,
     email_editora VARCHAR(100)
 );
 
--- DROP TABLE IF EXISTS Livro;
+-- DROP TABLE IF EXISTS Livro CASCADE;
 CREATE TABLE Livro (
-    isbn VARCHAR(13),
-    cod_livro SERIAL PRIMARY KEY NOT NULL,
+    cod_livro INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+	isbn VARCHAR(13),
     disponivel BOOLEAN NOT NULL,
     nome_livro VARCHAR(200) NOT NULL,
     genero VARCHAR(20),
-    nome_autor VARCHAR(200) NOT NULL,
-    cod_autor_livro SERIAL NOT NULL,
-    cod_editora_livro SERIAL NOT NULL
+    nome_pessoa VARCHAR(200) NOT NULL,
+    cod_pessoa INTEGER NOT NULL,
+    cod_editora INTEGER NOT NULL,
+    CONSTRAINT FK_cod_autor FOREIGN KEY (cod_pessoa) REFERENCES Autor (cod_pessoa),
+    CONSTRAINT FK_cod_editora FOREIGN KEY (cod_editora) REFERENCES Editora (cod_editora)
 );
 
--- DROP TABLE IF EXISTS Emprestimo;
+-- DROP TABLE IF EXISTS Emprestimo CASCADE;
 CREATE TABLE Emprestimo (
-    cod_emp SERIAL PRIMARY KEY NOT NULL,
+    cod_emp INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     data_emp DATE NOT NULL,
     data_venc DATE NOT NULL,
     status INTEGER NOT NULL, -- 1 ATIVO 0 INATIVO
     multa NUMERIC,
-    cpf_usuario VARCHAR(11) NOT NULL,
-    cod_livro_emprestimo SERIAL NOT NULL
+    cpf VARCHAR(11) NOT NULL,
+    cod_livro INTEGER NOT NULL,
+    CONSTRAINT FK_cpf_usuario FOREIGN KEY (cpf) REFERENCES Usuario (cpf),
+    CONSTRAINT FK_cod_livro FOREIGN KEY (cod_livro) REFERENCES Livro (cod_livro)
 );
 
--- DROP TABLE IF EXISTS Escreve;
+-- DROP TABLE IF EXISTS Escreve CASCADE;
 CREATE TABLE Escreve (
-    cod_autor SERIAL,
-    cod_livro SERIAL,
-    CONSTRAINT PK_escreve PRIMARY KEY (cod_autor, cod_livro),
+    cod_pessoa INTEGER,
+    cod_livro INTEGER,
+    CONSTRAINT PK_escreve PRIMARY KEY (cod_pessoa, cod_livro),
     CONSTRAINT FK_livro FOREIGN KEY (cod_livro) REFERENCES livro (cod_livro),
-    CONSTRAINT FK_autor FOREIGN KEY (cod_autor) REFERENCES Autor (cod_autor)
+    CONSTRAINT FK_autor FOREIGN KEY (cod_pessoa) REFERENCES Autor (cod_pessoa)
 );
-
-ALTER TABLE Livro
-ADD CONSTRAINT cod_autor
-FOREIGN KEY (cod_autor_livro)
-REFERENCES Autor (cod_autor);
-
-ALTER TABLE Livro
-ADD CONSTRAINT cod_editora
-FOREIGN KEY (cod_editora_livro)
-REFERENCES Editora (cod_editora);
-
-ALTER TABLE Emprestimo
-ADD CONSTRAINT cpf_usuario
-FOREIGN KEY (cpf_usuario)
-REFERENCES Usuario (cpf);
-
-ALTER TABLE Emprestimo
-ADD CONSTRAINT cod_livro_emprestimo
-FOREIGN KEY (cod_livro_emprestimo)
-REFERENCES Livro (cod_livro);
 
 
 --- Procedure para inserir livro/autor
