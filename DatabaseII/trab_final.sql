@@ -42,7 +42,7 @@ CREATE TABLE Livro (
     cod_pessoa INTEGER NOT NULL,
     cod_editora INTEGER NOT NULL,
     CONSTRAINT FK_cod_autor FOREIGN KEY (cod_pessoa) REFERENCES Autor (cod_pessoa),
-    CONSTRAINT FK_cod_editora FOREIGN KEY (cod_editora) REFERENCES Editora (cod_editora)
+    CONSTRAINT FK_cod_editora FOREIGN KEY (cod_editora) REFERENCES Editora (cod_editora)    
 );
 
 -- DROP TABLE IF EXISTS Emprestimo CASCADE;
@@ -50,12 +50,14 @@ CREATE TABLE Emprestimo (
     cod_emp INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     data_emp DATE NOT NULL,
     data_venc DATE NOT NULL,
-    status INTEGER NOT NULL, -- 1 ATIVO 0 INATIVO
+    status BOOLEAN NOT NULL, -- 1 ATIVO 0 INATIVO
     multa NUMERIC,
     cpf VARCHAR(11) NOT NULL,
     cod_livro INTEGER NOT NULL,
+    cod_funcionario INTEGER NOT NULL,
     CONSTRAINT FK_cpf_usuario FOREIGN KEY (cpf) REFERENCES Usuario (cpf),
-    CONSTRAINT FK_cod_livro FOREIGN KEY (cod_livro) REFERENCES Livro (cod_livro)
+    CONSTRAINT FK_cod_livro FOREIGN KEY (cod_livro) REFERENCES Livro (cod_livro),
+    CONSTRAINT FK_cod_funcionario FOREIGN KEY (cod_funcionario) REFERENCES Funcionario (cod_pessoa)
 );
 
 -- DROP TABLE IF EXISTS Escreve CASCADE;
