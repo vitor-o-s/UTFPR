@@ -65,10 +65,10 @@ CREATE TABLE Emprestimo (
 CREATE TABLE Multa (
     cod_multa INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     cod_emp INTEGER NOT NULL,
-    cpf INTEGER NOT NULL,
+    cpf VARCHAR(14) NOT NULL,
     valor NUMERIC NOT NULL,
 	pago BOOLEAN NOT NULL,
-    CONSTRAINT FK_codigo_emprestimo FOREIGN KEY (cod_emp) REFERENCES Emprestimo (cod_emp)
+    CONSTRAINT FK_codigo_emprestimo FOREIGN KEY (cod_emp) REFERENCES Emprestimo (cod_emp),
     CONSTRAINT FK_cpf_usuario FOREIGN KEY (cpf) REFERENCES Usuario (cpf)
 );
 
@@ -94,7 +94,7 @@ CREATE TABLE audit_emprestimo (
     multa NUMERIC,
     cpf VARCHAR(14),
     cod_livro INTEGER,
-    cod_funcionario INTEGER,
+    cod_funcionario INTEGER
 );
 
 ------------------------------------------------------
