@@ -50,6 +50,7 @@ CREATE TABLE Emprestimo (
     cod_emp INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     data_emp DATE NOT NULL,
     data_venc DATE NOT NULL,
+    data_devolucao DATE,
     status BOOLEAN NOT NULL, -- 1 ATIVO 0 INATIVO
     multa NUMERIC,
     cpf VARCHAR(14) NOT NULL,
@@ -78,6 +79,22 @@ CREATE TABLE Escreve (
     CONSTRAINT PK_escreve PRIMARY KEY (cod_pessoa, cod_livro),
     CONSTRAINT FK_livro FOREIGN KEY (cod_livro) REFERENCES livro (cod_livro),
     CONSTRAINT FK_autor FOREIGN KEY (cod_pessoa) REFERENCES Autor (cod_pessoa)
+);
+
+-- DROP TABLE IF EXISTS audit_emprestimo CASCADE;
+CREATE TABLE audit_emprestimo (
+    operacao CHAR,
+    data TIMESTAMP,
+    usuario VARCHAR,
+    cod_emp INTEGER ,
+    data_emp DATE,
+    data_venc DATE,
+    data_devolucao DATE,
+    status BOOLEAN,
+    multa NUMERIC,
+    cpf VARCHAR(14),
+    cod_livro INTEGER,
+    cod_funcionario INTEGER,
 );
 
 ------------------------------------------------------
@@ -150,6 +167,11 @@ BEGIN
 	END IF;
 	IF (SELECT (*) FROM Multa WHERE cpf = NEW.cpf AND pago = FALSE) THEN
 		RAISE EXCEPTION 'Não é possível realizar empréstimo, multas pendentes.'
+		
+	IF NEW.data_venc <> NEW.data_emp + INTERVAL '7 days' THEN
+        RAISE EXCEPTION 'A data de vencimento deve ser 7 dias após a data de empréstimo.';
+    END IF;
+    
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -177,14 +199,25 @@ EXECUTE FUNCTION validar_emprestimo();
 CREATE OR REPLACE FUNCTION insert_audit_table()
 RETURNS TRIGGER AS $$
 BEGIN
-    RETURN NEW;
+    IF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_emprestimo SELECT 'D', now(), user, OLD.*; 
+        RETURN OLD;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_emprestimo SELECT 'U', now(), user, NEW.*; 
+        RETURN NEW;
+    ELSIF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_emprestimo SELECT 'I', now(), user, NEW.*; 
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER trigger_insert_audit_table
-BEFORE INSERT OR UPDATE ON Empresitmo
+AFTER INSERT OR UPDATE OR DELETE ON Empresitmo
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_table();
+
 
 -----------------------------------------------------
 ---------------------- FUNÇÕES ----------------------
