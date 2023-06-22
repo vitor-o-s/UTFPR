@@ -52,7 +52,6 @@ CREATE TABLE Emprestimo (
     data_venc DATE NOT NULL,
     data_devolucao DATE,
     status BOOLEAN NOT NULL, -- 1 ATIVO 0 INATIVO
-    multa NUMERIC,
     cpf VARCHAR(14) NOT NULL,
     cod_livro INTEGER NOT NULL,
     cod_funcionario INTEGER NOT NULL,
@@ -91,7 +90,6 @@ CREATE TABLE audit_emprestimo (
     data_venc DATE,
     data_devolucao DATE,
     status BOOLEAN,
-    multa NUMERIC,
     cpf VARCHAR(14),
     cod_livro INTEGER,
     cod_funcionario INTEGER
@@ -208,8 +206,37 @@ EXECUTE FUNCTION insert_audit_table();
 ---------------------- FUNÇÕES ----------------------
 -----------------------------------------------------
 
----- Função para X coisa
-CREATE OR REPLACE FUNCTION AtualizaAtraso()
+---- Função para atualizar multa
+CREATE OR REPLACE FUNCTION atualizar_multa()
+RETURNS VOID AS $$
+DECLARE
+    data_venc DATE;
+    data_devolucao DATE;
+    cod_emp INTEGER;
+    diff_days INTEGER;
+    valor_multa NUMERIC;
+BEGIN
+    SELECT data_venc, data_devolucao, cod_emp INTO data_venc, data_devolucao, cod_emp
+    FROM Emprestimo
+    WHERE status = 0;
+
+    IF data_devolucao IS NULL THEN
+        diff_days := CURRENT_DATE - data_venc;
+    ELSE
+        diff_days := data_devolucao - data_venc;
+    END IF;
+
+    valor_multa := diff_days * 0.50; -- Valor da multa: R$0,50 por dia de atraso
+
+    UPDATE Multa
+    SET valor = valor_multa
+    WHERE cod_emp = cod_emp;
+
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 ---- Função para X coisa
 CREATE OR REPLACE FUNCTION AtualizaAtraso()
