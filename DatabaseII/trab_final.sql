@@ -348,17 +348,51 @@ EXPLAIN SELECT * FROM Livro WHERE genero = 'Genero 36';
 ----------------------- VIEWS -----------------------
 -----------------------------------------------------
 
-CREATE OR REPLACE VIEW EmprestimoGenero AS
-SELECT count(e.*), l.genero FROM Emprestimo e NATURAL JOIN Livro l GROUP BY l.genero ORDER BY 1;
+-- CREATE OR REPLACE VIEW EmprestimoGenero AS
+-- SELECT count(e.*), l.genero FROM Emprestimo e NATURAL JOIN Livro l GROUP BY l.genero ORDER BY 1;
 
-CREATE OR REPLACE VIEW LivrosMaisEmprestados AS
-SELECT count(e.*) FROM Emprestimo e NATURAL JOIN  Livro l GROUP BY l.isbn ORDER BY 1;
+-- CREATE OR REPLACE VIEW LivrosMaisEmprestados AS
+-- SELECT count(e.*) FROM Emprestimo e NATURAL JOIN  Livro l GROUP BY l.isbn ORDER BY 1;
 
-CREATE OR REPLACE VIEW MaiorDevedor AS
-SELECT U.nome_pessoa AS MaioresMultas, e.multa 
-FROM Emprestimo e NATURAL JOIN Usuario u
-WHERE e.status = 1;
+-- CREATE OR REPLACE VIEW MaiorDevedor AS
+-- SELECT U.nome_pessoa AS MaioresMultas, e.multa 
+-- FROM Emprestimo e NATURAL JOIN Usuario u
+-- WHERE e.status = 1;
+
+
+
+CREATE OR REPLACE VIEW genero_mais_emprestado AS
+SELECT genero, COUNT(*) AS quantidade
+FROM Livro
+JOIN Emprestimo ON Livro.cod_livro = Emprestimo.cod_livro
+GROUP BY genero
+ORDER BY quantidade DESC
+LIMIT 1;
+
+CREATE OR REPLACE VIEW livro_mais_emprestado AS
+SELECT nome_livro, COUNT(*) AS quantidade
+FROM Livro
+JOIN Emprestimo ON Livro.cod_livro = Emprestimo.cod_livro
+GROUP BY nome_livro
+ORDER BY quantidade DESC
+LIMIT 1;
+
+CREATE OR REPLACE VIEW valor_multas_por_pessoa AS
+SELECT Pessoa.nome_pessoa, SUM(Multa.valor) AS valor_multas
+FROM Pessoa
+JOIN Multa ON Pessoa.cod_pessoa = Multa.cod_pessoa
+GROUP BY Pessoa.nome_pessoa
+ORDER BY valor_multas DESC;
+
+
 
 --- VIEW LIVROS EM ATRASO 
+CREATE OR REPLACE VIEW livros_em_atraso AS
+SELECT Livro.nome_livro
+FROM Livro
+JOIN Emprestimo ON Livro.cod_livro = Emprestimo.cod_livro
+WHERE Emprestimo.data_devolucao IS NULL OR Emprestimo.data_devolucao > CURRENT_DATE;
+
+
 
 -- EXTRACT(DAY FROM AGE(CURRENT_DATE, data_venc))
