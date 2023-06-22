@@ -1,21 +1,21 @@
 -- DROP TABLE IF EXISTS Pessoa CASCADE;
 CREATE TABLE Pessoa(
     cod_pessoa INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL CONSTRAINT cod_pessoa PRIMARY KEY,
-    nome_pessoa VARCHAR (200) NOT NULL 
+    nome_pessoa VARCHAR (200) NOT NULL
 );
 
 -- DROP TABLE IF EXISTS FUNCIONARIO CASCADE;
 CREATE TABLE Funcionario (
-    tel_servidor VARCHAR(9),
-    email_servidor VARCHAR(100) NOT NULL,
+    telefone VARCHAR(13) NOT NULL,
+    email_contato VARCHAR(100) NOT NULL,
 	CONSTRAINT cod_funcionario PRIMARY KEY (cod_pessoa)
 ) INHERITS(Pessoa);
 
 -- DROP TABLE IF EXISTS Usuario CASCADE;
 CREATE TABLE Usuario (
-    cpf VARCHAR(11) UNIQUE NOT NULL,
-    tel_usuario VARCHAR(9) NOT NULL,
-    email_usuario VARCHAR(100),
+    cpf VARCHAR(14) UNIQUE NOT NULL,
+    telefone VARCHAR(13) NOT NULL,
+    email_contato VARCHAR(100),
 	CONSTRAINT cod_usuario PRIMARY KEY (cod_pessoa)
 ) INHERITS(Pessoa);
 
@@ -52,7 +52,7 @@ CREATE TABLE Emprestimo (
     data_venc DATE NOT NULL,
     status BOOLEAN NOT NULL, -- 1 ATIVO 0 INATIVO
     multa NUMERIC,
-    cpf VARCHAR(11) NOT NULL,
+    cpf VARCHAR(14) NOT NULL,
     cod_livro INTEGER NOT NULL,
     cod_funcionario INTEGER NOT NULL,
     CONSTRAINT FK_cpf_usuario FOREIGN KEY (cpf) REFERENCES Usuario (cpf),
@@ -80,27 +80,24 @@ CREATE TABLE Escreve (
     CONSTRAINT FK_autor FOREIGN KEY (cod_pessoa) REFERENCES Autor (cod_pessoa)
 );
 
-
---- Procedure para inserir livro/autor
-
 ------------------------------------------------------
 ---------------------- TRIGGERS ----------------------
 ------------------------------------------------------
 
 ----- Trigger para Validar Pessoa
-CREATE OR REPLACE FUNCTION validar_pessoa()
+CREATE OR REPLACE FUNCTION validar_funcionario()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.data_reg > DATE(NOW()) THEN
-        RAISE EXCEPTION 'A data de registro não pode ser posterior à data atual.';
+    NEW.nome_pessoa = LOWER(NEW.nome_pessoa);
+
+    IF NEW.telefone !~ '^\d{2}\d{4}-\d{4}$' OR NEW.telefone IS NULL THEN
+        RAISE EXCEPTION 'O telefone do funcionário deve estar no formato (DD)XXXX-XXXX.';
+    END IF;
+    
+    IF NEW.email_contato !~ '^.+@biblioteca\.com\.br$' OR NEW.email_contato IS NULL THEN
+        RAISE EXCEPTION 'O email do funcionário deve estar no formato xxxx@biblioteca.com.br.';
     END IF;
 
-    NEW.nome = LOWER(NEW.nome);
-
-    IF NEW.cpf !~ '^\d{3}\.\d{3}\.\d{3}-\d{2}$' THEN
-        RAISE EXCEPTION 'O CPF deve estar no formato xxx.xxx.xxx-xx.';
-    END IF;
-    -- validar mascara de email
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -108,12 +105,36 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER trigger_validar_funcionario
 BEFORE INSERT OR UPDATE ON Funcionario
 FOR EACH ROW
-EXECUTE FUNCTION validar_pessoa();
+EXECUTE FUNCTION validar_funcionario();
 
+
+----- Trigger para Validar Usuario
+CREATE OR REPLACE FUNCTION validar_usuario()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.nome_pessoa = LOWER(NEW.nome_pessoa);
+
+    IF NEW.cpf !~ '^\d{3}\.\d{3}\.\d{3}-\d{2}$' THEN
+        RAISE EXCEPTION 'O CPF deve estar no formato xxx.xxx.xxx-xx.';
+    END IF;
+    
+    IF NEW.telefone !~ '^\d{2}\d{4}-\d{4}$' OR NEW.telefone IS NULL THEN
+        RAISE EXCEPTION 'O telefone do usuário deve estar no formato (DD)XXXX-XXXX.';
+    END IF;
+    
+    IF NEW.email_contato IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM Usuario WHERE email_contato = NEW.email_contato AND cod_pessoa <> NEW.cod_pessoa) THEN
+            RAISE EXCEPTION 'Email de usuário já está em uso';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER trigger_validar_usuario
 BEFORE INSERT OR UPDATE ON Usuario
 FOR EACH ROW
-EXECUTE FUNCTION validar_pessoa();
+EXECUTE FUNCTION validar_usuario();
 
 ----- Trigger para Validar Emprestimo
 CREATE OR REPLACE FUNCTION validar_emprestimo()
@@ -139,18 +160,31 @@ FOR EACH ROW
 EXECUTE FUNCTION validar_emprestimo();
 
 
------ Trigger para X coisa
-CREATE OR REPLACE FUNCTION Nome_Funcao()
+----- Trigger para validar Editora
+-- CREATE OR REPLACE FUNCTION valida_editora()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE OR REPLACE TRIGGER trigger_valida_editora
+-- BEFORE INSERT OR UPDATE ON Editora
+-- FOR EACH ROW
+-- EXECUTE FUNCTION valida_editora();
+
+----- Trigger Inserção auditoria
+CREATE OR REPLACE FUNCTION insert_audit_table()
 RETURNS TRIGGER AS $$
 BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER trigger_nome_funcao
-BEFORE INSERT OR UPDATE ON TABELA
+CREATE OR REPLACE TRIGGER trigger_insert_audit_table
+BEFORE INSERT OR UPDATE ON Empresitmo
 FOR EACH ROW
-EXECUTE FUNCTION Nome_Funcao();
+EXECUTE FUNCTION insert_audit_table();
 
 -----------------------------------------------------
 ---------------------- FUNÇÕES ----------------------
@@ -168,7 +202,7 @@ CREATE OR REPLACE FUNCTION AtualizaAtraso()
 -----------------------------------------------------
 --------------------- INSERÇÕES ---------------------
 -----------------------------------------------------
-
+--- Procedure para inserir livro/autor
 DO
 $do$
 BEGIN
