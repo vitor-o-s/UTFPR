@@ -60,6 +60,19 @@ CREATE TABLE Emprestimo (
     CONSTRAINT FK_cod_funcionario FOREIGN KEY (cod_funcionario) REFERENCES Funcionario (cod_pessoa)
 );
 
+-- DROP TABLE IF EXISTS Multa CASCADE;
+CREATE TABLE Multa (
+    cod_multa INTEGER AUTO_INCREMENT PRIMARY KEY,
+    codigo_emprestimo INTEGER NOT NULL,
+    codigo_usuario INTEGER NOT NULL,
+    validade DATE NOT NULL,
+    valor NUMERIC NOT NULL,
+	pago BOOLEAN NOT NULL,
+	
+    CONSTRAINT FK_codigo_emprestimo FOREIGN KEY (codigo_emprestimo) REFERENCES Emprestimo (cod_emp)
+	CONSTRAINT FK_codigo_usuario FOREIGN KEY (codigo_usuario) REFERENCES Usuario (cpf)
+);
+
 -- DROP TABLE IF EXISTS Escreve CASCADE;
 CREATE TABLE Escreve (
     cod_pessoa INTEGER,
@@ -76,7 +89,7 @@ CREATE TABLE Escreve (
 ---------------------- TRIGGERS ----------------------
 ------------------------------------------------------
 
------ Trigger para X coisa
+----- Trigger para Validar Pessoa
 CREATE OR REPLACE FUNCTION validar_pessoa()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -104,18 +117,28 @@ BEFORE INSERT OR UPDATE ON Usuario
 FOR EACH ROW
 EXECUTE FUNCTION validar_pessoa();
 
------ Trigger para X coisa
-CREATE OR REPLACE FUNCTION Nome_Funcao()
+----- Trigger para Validar Emprestimo
+CREATE OR REPLACE FUNCTION validar_emprestimo()
 RETURNS TRIGGER AS $$
+DECLARE
+	qtde_disponiveis INTEGER;
 BEGIN
+	SELECT COUNT(*) INTO qtde_disponiveis 
+	FROM Livro 
+	WHERE isbn = NEW.isbn AND disponivel = TRUE; 
+	IF qtde_disponiveis <= 0 THEN
+        RAISE EXCEPTION 'Livro indisponível.';
+	END IF;
+	IF (SELECT (*) FROM Multa WHERE codigo_usuario = NEW.cpf AND pago = FALSE) THEN
+		RAISE EXCEPTION 'Não é possível realizar empréstimo, multas pendentes.'
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER trigger_nome_funcao
-BEFORE INSERT OR UPDATE ON TABELA
+CREATE OR REPLACE TRIGGER trigger_valida_emprestimo
+BEFORE INSERT OR UPDATE ON Emprestimo
 FOR EACH ROW
-EXECUTE FUNCTION Nome_Funcao();
+EXECUTE FUNCTION validar_emprestimo();
 
 
 ----- Trigger para X coisa
