@@ -243,7 +243,28 @@ $$ LANGUAGE plpgsql;
 
 
 ---- Função para Renovar Emprestimo
-CREATE OR REPLACE FUNCTION RenovaEmprestimo()
+CREATE OR REPLACE FUNCTION renovar_emprestimo()
+RETURNS VOID AS $$
+DECLARE
+    data_venc DATE;
+    data_devolucao DATE;
+    cod_emp INTEGER;
+BEGIN
+    SELECT data_venc, data_devolucao, cod_emp INTO data_venc, data_devolucao, cod_emp
+    FROM Emprestimo
+    WHERE status = 1;
+
+    IF CURRENT_DATE <= data_venc THEN
+        data_venc := data_venc + interval '7 days';
+  	END IF;
+
+    UPDATE Emprestimo
+    SET data_venc = data_vencimento
+    WHERE cod_emp = cod_emp;
+
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
 ---- Função para Inserir Livro
 CREATE OR REPLACE FUNCTION INSERIRLIVRO()
