@@ -62,15 +62,13 @@ CREATE TABLE Emprestimo (
 
 -- DROP TABLE IF EXISTS Multa CASCADE;
 CREATE TABLE Multa (
-    cod_multa INTEGER AUTO_INCREMENT PRIMARY KEY,
-    codigo_emprestimo INTEGER NOT NULL,
-    codigo_usuario INTEGER NOT NULL,
-    validade DATE NOT NULL,
+    cod_multa INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    cod_emp INTEGER NOT NULL,
+    cpf INTEGER NOT NULL,
     valor NUMERIC NOT NULL,
 	pago BOOLEAN NOT NULL,
-	
-    CONSTRAINT FK_codigo_emprestimo FOREIGN KEY (codigo_emprestimo) REFERENCES Emprestimo (cod_emp)
-	CONSTRAINT FK_codigo_usuario FOREIGN KEY (codigo_usuario) REFERENCES Usuario (cpf)
+    CONSTRAINT FK_codigo_emprestimo FOREIGN KEY (cod_emp) REFERENCES Emprestimo (cod_emp)
+    CONSTRAINT FK_cpf_usuario FOREIGN KEY (cpf) REFERENCES Usuario (cpf)
 );
 
 -- DROP TABLE IF EXISTS Escreve CASCADE;
