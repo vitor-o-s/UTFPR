@@ -127,7 +127,7 @@ BEGIN
 	IF qtde_disponiveis <= 0 THEN
         RAISE EXCEPTION 'Livro indisponível.';
 	END IF;
-	IF (SELECT (*) FROM Multa WHERE codigo_usuario = NEW.cpf AND pago = FALSE) THEN
+	IF (SELECT (*) FROM Multa WHERE cpf = NEW.cpf AND pago = FALSE) THEN
 		RAISE EXCEPTION 'Não é possível realizar empréstimo, multas pendentes.'
     RETURN NEW;
 END;
