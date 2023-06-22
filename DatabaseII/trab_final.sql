@@ -160,6 +160,7 @@ BEGIN
 	SELECT COUNT(*) INTO qtde_disponiveis 
 	FROM Livro 
 	WHERE isbn = NEW.isbn AND disponivel = TRUE; 
+	--- validar se livro existe
 	IF qtde_disponiveis <= 0 THEN
         RAISE EXCEPTION 'Livro indisponível.';
 	END IF;
@@ -216,21 +217,23 @@ DECLARE
     diff_days INTEGER;
     valor_multa NUMERIC;
 BEGIN
-    SELECT data_venc, data_devolucao, cod_emp INTO data_venc, data_devolucao, cod_emp
-    FROM Emprestimo
-    WHERE status = 0;
+    FOR data_venc, data_devolucao, cod_emp IN
+        SELECT data_venc, data_devolucao, cod_emp
+        FROM Emprestimo
+        WHERE status = 0
+    LOOP
+        IF data_devolucao IS NULL THEN
+            diff_days := EXTRACT(DAY FROM AGE(CURRENT_DATE, data_venc));
+        ELSE
+            diff_days := EXTRACT(DAY FROM AGE(data_devolucao, data_venc));
+        END IF;
 
-    IF data_devolucao IS NULL THEN
-        diff_days := CURRENT_DATE - data_venc;
-    ELSE
-        diff_days := data_devolucao - data_venc;
-    END IF;
+        valor_multa := diff_days * 0.50; -- Valor da multa: R$0,50 por dia de atraso (multiplicado por 100 para armazenar como inteiro)
 
-    valor_multa := diff_days * 0.50; -- Valor da multa: R$0,50 por dia de atraso
-
-    UPDATE Multa
-    SET valor = valor_multa
-    WHERE cod_emp = cod_emp;
+        UPDATE Multa
+        SET valor = valor_multa
+        WHERE cod_emp = cod_emp;
+    END LOOP;
 
     RETURN;
 END;
@@ -238,11 +241,14 @@ $$ LANGUAGE plpgsql;
 
 
 
----- Função para X coisa
-CREATE OR REPLACE FUNCTION AtualizaAtraso()
 
----- Função para X coisa
-CREATE OR REPLACE FUNCTION AtualizaAtraso()
+---- Função para Renovar Emprestimo
+CREATE OR REPLACE FUNCTION RenovaEmprestimo()
+
+---- Função para Inserir Livro
+CREATE OR REPLACE FUNCTION INSERIRLIVRO()
+
+-- POSTERGAR RESTRICOES NA PROCEDURE
  
 -----------------------------------------------------
 --------------------- INSERÇÕES ---------------------
@@ -352,5 +358,7 @@ CREATE OR REPLACE VIEW MaiorDevedor AS
 SELECT U.nome_pessoa AS MaioresMultas, e.multa 
 FROM Emprestimo e NATURAL JOIN Usuario u
 WHERE e.status = 1;
+
+--- VIEW LIVROS EM ATRASO 
 
 -- EXTRACT(DAY FROM AGE(CURRENT_DATE, data_venc))
