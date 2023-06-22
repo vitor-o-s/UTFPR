@@ -165,9 +165,9 @@ BEGIN
 	IF qtde_disponiveis <= 0 THEN
         RAISE EXCEPTION 'Livro indisponível.';
 	END IF;
-	IF (SELECT (*) FROM Multa WHERE cpf = NEW.cpf AND pago = FALSE) THEN
-		RAISE EXCEPTION 'Não é possível realizar empréstimo, multas pendentes.'
-		
+	IF (SELECT cpf FROM Multa WHERE cpf = NEW.cpf AND pago = FALSE) THEN
+		RAISE EXCEPTION 'Não é possível realizar empréstimo, multas pendentes.';
+	END IF;
 	IF NEW.data_venc <> NEW.data_emp + INTERVAL '7 days' THEN
         RAISE EXCEPTION 'A data de vencimento deve ser 7 dias após a data de empréstimo.';
     END IF;
@@ -200,10 +200,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER trigger_insert_audit_table
-AFTER INSERT OR UPDATE OR DELETE ON Empresitmo
+AFTER INSERT OR UPDATE OR DELETE ON Emprestimo
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_table();
-
 
 -----------------------------------------------------
 ---------------------- FUNÇÕES ----------------------
