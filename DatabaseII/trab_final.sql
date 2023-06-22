@@ -181,20 +181,6 @@ BEFORE INSERT OR UPDATE ON Emprestimo
 FOR EACH ROW
 EXECUTE FUNCTION validar_emprestimo();
 
-
------ Trigger para validar Editora
--- CREATE OR REPLACE FUNCTION valida_editora()
--- RETURNS TRIGGER AS $$
--- BEGIN
---     RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- CREATE OR REPLACE TRIGGER trigger_valida_editora
--- BEFORE INSERT OR UPDATE ON Editora
--- FOR EACH ROW
--- EXECUTE FUNCTION valida_editora();
-
 ----- Trigger Inserção auditoria
 CREATE OR REPLACE FUNCTION insert_audit_table()
 RETURNS TRIGGER AS $$
