@@ -243,28 +243,30 @@ $$ LANGUAGE plpgsql;
 
 
 ---- Função para Renovar Emprestimo -- CORRIGIR
-CREATE OR REPLACE FUNCTION renovar_emprestimo()
+CREATE OR REPLACE FUNCTION renovar_emprestimo(p_cod_emp INTEGER)
 RETURNS VOID AS $$
 DECLARE
     data_venc DATE;
     data_devolucao DATE;
-    cod_emp INTEGER;
 BEGIN
-    SELECT data_venc, data_devolucao, cod_emp INTO data_venc, data_devolucao, cod_emp
+    SELECT data_venc, data_devolucao
+    INTO data_venc, data_devolucao
     FROM Emprestimo
-    WHERE status = 1;
+    WHERE cod_emp = p_cod_emp;
 
-    IF CURRENT_DATE <= data_venc THEN
-        data_venc := data_venc + interval '7 days';
-  	END IF;
-
-    UPDATE Emprestimo
-    SET data_venc = data_vencimento
-    WHERE cod_emp = cod_emp;
+    IF data_venc < CURRENT_DATE THEN
+        RAISE EXCEPTION 'Não foi possível renovar o empréstimo. O empréstimo está atrasado.';
+    ELSE
+        data_venc := CURRENT_DATE + INTERVAL '7 days';
+        UPDATE Emprestimo
+        SET data_venc = data_venc
+        WHERE cod_emp = p_cod_emp;
+    END IF;
 
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
+
 
 ---- Função para Inserir Livro
 CREATE OR REPLACE FUNCTION INSERIRLIVRO()
@@ -277,8 +279,8 @@ CREATE OR REPLACE FUNCTION INSERIRLIVRO()
 
 ----- Insere 1500 pessoa (por escolha e facilitação de implementação
 ----- de 1 - 999 são usuário
------ 1000 - 1299 Funcionarios
------ 1300 - 1500 Autores
+----- 1000 - 1199 Funcionarios
+----- 1200 - 1500 Autores
 CREATE OR REPLACE FUNCTION gerar_nomes()
 RETURNS VOID AS $$
 DECLARE
@@ -296,100 +298,95 @@ $$ LANGUAGE plpgsql;
 SELECT gerar_nomes();
 
 
-
-
-
-
-------------------------------------
-DO $$
+--- Usuarios 
+CREATE OR REPLACE FUNCTION inserir_usuarios()
+RETURNS VOID AS $$
 DECLARE
     i INTEGER;
+    nome VARCHAR(200);
+    cpf VARCHAR(14);
+    telefone VARCHAR(13);
+    email_contato VARCHAR(100);
 BEGIN
-	-- Generate Funcionario
-    FOR i IN 1..1000 LOOP
-        INSERT INTO Pessoa (nome_pessoa)
-        VALUES ('Funcionario ' || i);
-
-        INSERT INTO Funcionario (cod_pessoa, nome_pessoa, telefone, email_contato) 
-        VALUES (currval('pessoa_cod_pessoa_seq'), 'Funcionario ' || i, LPAD((i-1000)::TEXT, 6, '0') || '-' ||LPAD((i-1000)::TEXT, 4, '0'), 'funcionario' || i || '@biblioteca.com.br');
+    FOR i IN 2..1000 LOOP -- DELETEI O USER 1 hehe;	
+        nome := (SELECT nome_pessoa FROM Pessoa WHERE cod_pessoa = i);
+        cpf := concat(
+                lpad(floor(random() * 1000)::int::text, 3, '0'), '.',
+                lpad(floor(random() * 1000)::int::text, 3, '0'), '.',
+                lpad(floor(random() * 1000)::int::text, 3, '0'), '-',
+                lpad(floor(random() * 100)::int::text, 2, '0')
+            );
+        telefone := concat(
+                lpad(floor(random() * 1000000)::int::text, 6, '0'), '-',
+                lpad(floor(random() * 10000)::int::text, 4, '0')
+            );
+        email_contato := replace(nome, ' ', '') || i || '@example.com';
+        
+        INSERT INTO Usuario (cod_pessoa, nome_pessoa, cpf, telefone, email_contato)
+        VALUES (i, nome, cpf, telefone, email_contato);
     END LOOP;
 
-    -- Generate Usuario
-    FOR i IN 1001..2000 LOOP
-        INSERT INTO Pessoa (nome_pessoa)
-        VALUES ('Usuario ' || (i-1000));
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
-        INSERT INTO Usuario (cod_pessoa, nome_pessoa, cpf, telefone, email_contato) 
-        VALUES (currval('pessoa_cod_pessoa_seq'), 'Usuario ' || (i-1000), LPAD((i-1000)::TEXT, 3, '0') || '.' || LPAD((i-1000)::TEXT, 3, '0') || '.' || LPAD((i-1000)::TEXT, 3, '0') || '-' || LPAD((i-1000)::TEXT, 2, '0'), '(46)' || LPAD((i % 10000)::TEXT, 4, '0') || '-' || LPAD((i % 10000)::TEXT, 4, '0'), 'usuario' || (i-1000) || '@gmail.com');
+SELECT inserir_usuarios();
+SELECT * FROM Usuario;
+--- Funcionarios
+CREATE OR REPLACE FUNCTION inserir_funcionario()
+RETURNS VOID AS $$
+DECLARE
+    i INTEGER;
+    nome VARCHAR(200);
+    telefone VARCHAR(13);
+    email_contato VARCHAR(100);
+BEGIN
+    FOR i IN 1001..1200 LOOP
+        nome := (SELECT nome_pessoa FROM Pessoa WHERE cod_pessoa = i LIMIT 1); -- Estranhamente retorna + de 1 nome e não está funcionando
+        telefone := concat(
+                lpad(floor(random() * 1000000)::int::text, 6, '0'), '-',
+                lpad(floor(random() * 10000)::int::text, 4, '0')
+            );
+        email_contato := replace(nome, ' ', '') || i || '@biblioteca.com.br';
+        
+        INSERT INTO Funcionario (cod_pessoa, nome_pessoa, telefone, email_contato)
+        VALUES (i, nome, telefone, email_contato);
     END LOOP;
 
-    -- Generate Autor
-    FOR i IN 2001..3000 LOOP
-        INSERT INTO Pessoa (nome_pessoa)
-        VALUES ('Autor ' || (i-2000));
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
-        INSERT INTO Autor (cod_pessoa, nome_pessoa) 
-        VALUES (currval('pessoa_cod_pessoa_seq'), 'Autor ' || (i-2000));
-    END LOOP;
-    
-    FOR i IN 1..100 LOOP
+SELECT inserir_usuarios();
+SELECT * FROM Funcionario;
+
+
+
+--- Insere em Editora
+CREATE OR REPLACE FUNCTION inserir_editora()
+RETURNS VOID AS $$
+DECLARE
+    nome_editora VARCHAR(50);
+    email_editora VARCHAR(100);
+BEGIN
+    FOR i IN 1..150 LOOP
+        nome_editora := 'Editora ' || i;
+        email_editora := replace('email' || i, ' ', '') || '@editora.com.br';
+
         INSERT INTO Editora (nome_editora, email_editora)
-        VALUES ('Editora ' || i, 'editora' || i || '@biblioteca.com.br');
+        VALUES (nome_editora, email_editora);
     END LOOP;
-    
-    -- Generate Livro
-    FOR i IN 1..1000 LOOP
-        INSERT INTO Livro (isbn, disponivel, nome_livro, genero, nome_pessoa, cod_pessoa, cod_editora)
-        VALUES (LPAD(i::TEXT, 13, '0'), true, 'Livro ' || i, 'Genero ' || ((i-1) % 10 + 1), 'Autor ' || ((i-1) % 1000 + 2001), ((i-1) % 1000 + 2001), ((i-1) % 100 + 1));
-    END LOOP;
+	RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
-    
-    FOR i IN 1..1000 LOOP
-        INSERT INTO Emprestimo (data_emp, data_venc, status, cpf, cod_livro, cod_funcionario)
-        VALUES (current_date, current_date + interval '7 days', ((i-1) % 2), LPAD((i+1000)::TEXT, 3, '0') || '.' || LPAD((i % 100)::TEXT, 3, '0') || '.' || LPAD((i % 100)::TEXT, 3, '0') || '-00', i, ((i-1) % 1000 + 1));
-        
-        INSERT INTO Multa (valor, pago, cod_emp)
-        VALUES (i * 0.5, false, i);
-    END LOOP;
-END $$;
+SELECT inserir_editora();
+SELECT * FROM Editora;
 
 
---- Procedure para inserir livro/autor
-DO
-$do$
-BEGIN
-    FOR i IN 1..1000 LOOP 
-        INSERT INTO Funcionario (nome_servidor, tel_servidor, email_servidor) 
-        VALUES ('Funcionario ' || i, floor(random() * (999999999-100000000+1) + 100000000)::VARCHAR, 'Funcionario' || i || '@gmail.com');
-        
-        INSERT INTO Autor (nome_autor) 
-        VALUES ('Autor ' || i);
-        
-        INSERT INTO Editora (nome_editora, email_editora) 
-        VALUES ('Editora ' || i, 'Editora' || i || '@gmail.com');
+-------------------- As inserções não foram finalizadas
 
-    END LOOP;
-END
-$do$
 
-DO
-$do$
-BEGIN
-    FOR i IN 1..10000 LOOP       
-        
-        INSERT INTO Usuario (cpf, nome_usuario, tel_usuario, email_usuario) 
-        VALUES (lpad(i::VARCHAR, 11, '0'), 'Usuario ' || i, floor(random() * (999999999-100000000+1) + 100000000)::VARCHAR, 'Usuario' || i || '@gmail.com');
-
-        INSERT INTO Livro (isbn, nome_livro, genero, nome_autor, cod_autor_livro, cod_editora_livro) 
-        VALUES (lpad(i::VARCHAR, 13, '0'), 'Livro ' || i, 'Genero ' || (i % 200), 'Autor ' || (i % 10 + 1), (i % 10 + 1), (i % 10 + 1));
-        
-        INSERT INTO Emprestimo (data_emp, data_venc, status, atraso, cpf_usuario, cod_livro_emprestimo) 
-        VALUES (current_date - (i % 30), current_date + (i % 30), i % 2, i % 2 = 0, lpad(i::VARCHAR, 11, '0'), lpad(i::VARCHAR, 13, '0'));
-    END LOOP;
-END
-$do$
-
-SELECT * from Usuario;
 
 -----------------------------------------------------
 ---------------------- INDEXES ----------------------
@@ -449,19 +446,6 @@ EXPLAIN SELECT * FROM Livro WHERE genero = 'Genero 36';
 ----------------------- VIEWS -----------------------
 -----------------------------------------------------
 
--- CREATE OR REPLACE VIEW EmprestimoGenero AS
--- SELECT count(e.*), l.genero FROM Emprestimo e NATURAL JOIN Livro l GROUP BY l.genero ORDER BY 1;
-
--- CREATE OR REPLACE VIEW LivrosMaisEmprestados AS
--- SELECT count(e.*) FROM Emprestimo e NATURAL JOIN  Livro l GROUP BY l.isbn ORDER BY 1;
-
--- CREATE OR REPLACE VIEW MaiorDevedor AS
--- SELECT U.nome_pessoa AS MaioresMultas, e.multa 
--- FROM Emprestimo e NATURAL JOIN Usuario u
--- WHERE e.status = 1;
-
-
-
 CREATE OR REPLACE VIEW genero_mais_emprestado AS
 SELECT genero, COUNT(*) AS quantidade
 FROM Livro
@@ -485,15 +469,8 @@ JOIN Multa ON Pessoa.cod_pessoa = Multa.cod_pessoa
 GROUP BY Pessoa.nome_pessoa
 ORDER BY valor_multas DESC;
 
-
-
---- VIEW LIVROS EM ATRASO 
 CREATE OR REPLACE VIEW livros_em_atraso AS
 SELECT Livro.nome_livro
 FROM Livro
 JOIN Emprestimo ON Livro.cod_livro = Emprestimo.cod_livro
 WHERE Emprestimo.data_devolucao IS NULL OR Emprestimo.data_devolucao > CURRENT_DATE;
-
-
-
--- EXTRACT(DAY FROM AGE(CURRENT_DATE, data_venc))
