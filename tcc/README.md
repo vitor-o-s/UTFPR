@@ -5,7 +5,7 @@
 # Bancos de Dados Temporais Testados 
 
 * [Apache Druid](https://druid.apache.org/docs/latest/design/index.html)
-* [Graphite](https://graphite;readthecos.io/en/latest/#)
+* [Graphite](https://graphite.readthedocs.io/en/latest/)
 * [InfluxDB](https://docs.influxdata.com/)
 * [TDengine](https://docs.tdengine.com/)
 * [TimescaleDB](https://docs.timescale.com/)
