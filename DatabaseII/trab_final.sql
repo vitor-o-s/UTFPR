@@ -242,7 +242,7 @@ $$ LANGUAGE plpgsql;
 
 
 
----- Função para Renovar Emprestimo
+---- Função para Renovar Emprestimo -- CORRIGIR
 CREATE OR REPLACE FUNCTION renovar_emprestimo()
 RETURNS VOID AS $$
 DECLARE
@@ -274,6 +274,86 @@ CREATE OR REPLACE FUNCTION INSERIRLIVRO()
 -----------------------------------------------------
 --------------------- INSERÇÕES ---------------------
 -----------------------------------------------------
+
+----- Insere 1500 pessoa (por escolha e facilitação de implementação
+----- de 1 - 999 são usuário
+----- 1000 - 1299 Funcionarios
+----- 1300 - 1500 Autores
+CREATE OR REPLACE FUNCTION gerar_nomes()
+RETURNS VOID AS $$
+DECLARE
+  nomes VARCHAR[] = '{ "João", "Maria", "Pedro", "Ana", "José", "Mariana", "Carlos", "Luisa", "Fernando", "Laura"}';
+  sobrenomes VARCHAR[] = '{"Silva", "Santos", "Pereira", "Oliveira", "Ribeiro", "Almeida", "Ferreira", "Gomes", "Martins", "Rodrigues"}';
+  total_nomes INTEGER := 1500;
+  i INTEGER;
+BEGIN
+  FOR i IN 1..total_nomes LOOP
+    INSERT INTO Pessoa (nome_pessoa)
+    VALUES (nomes[FLOOR(RANDOM() * 10 + 1)] || ' ' || sobrenomes[FLOOR(RANDOM() * 10 + 1)]);
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+SELECT gerar_nomes();
+
+
+
+
+
+
+------------------------------------
+DO $$
+DECLARE
+    i INTEGER;
+BEGIN
+	-- Generate Funcionario
+    FOR i IN 1..1000 LOOP
+        INSERT INTO Pessoa (nome_pessoa)
+        VALUES ('Funcionario ' || i);
+
+        INSERT INTO Funcionario (cod_pessoa, nome_pessoa, telefone, email_contato) 
+        VALUES (currval('pessoa_cod_pessoa_seq'), 'Funcionario ' || i, LPAD((i-1000)::TEXT, 6, '0') || '-' ||LPAD((i-1000)::TEXT, 4, '0'), 'funcionario' || i || '@biblioteca.com.br');
+    END LOOP;
+
+    -- Generate Usuario
+    FOR i IN 1001..2000 LOOP
+        INSERT INTO Pessoa (nome_pessoa)
+        VALUES ('Usuario ' || (i-1000));
+
+        INSERT INTO Usuario (cod_pessoa, nome_pessoa, cpf, telefone, email_contato) 
+        VALUES (currval('pessoa_cod_pessoa_seq'), 'Usuario ' || (i-1000), LPAD((i-1000)::TEXT, 3, '0') || '.' || LPAD((i-1000)::TEXT, 3, '0') || '.' || LPAD((i-1000)::TEXT, 3, '0') || '-' || LPAD((i-1000)::TEXT, 2, '0'), '(46)' || LPAD((i % 10000)::TEXT, 4, '0') || '-' || LPAD((i % 10000)::TEXT, 4, '0'), 'usuario' || (i-1000) || '@gmail.com');
+    END LOOP;
+
+    -- Generate Autor
+    FOR i IN 2001..3000 LOOP
+        INSERT INTO Pessoa (nome_pessoa)
+        VALUES ('Autor ' || (i-2000));
+
+        INSERT INTO Autor (cod_pessoa, nome_pessoa) 
+        VALUES (currval('pessoa_cod_pessoa_seq'), 'Autor ' || (i-2000));
+    END LOOP;
+    
+    FOR i IN 1..100 LOOP
+        INSERT INTO Editora (nome_editora, email_editora)
+        VALUES ('Editora ' || i, 'editora' || i || '@biblioteca.com.br');
+    END LOOP;
+    
+    -- Generate Livro
+    FOR i IN 1..1000 LOOP
+        INSERT INTO Livro (isbn, disponivel, nome_livro, genero, nome_pessoa, cod_pessoa, cod_editora)
+        VALUES (LPAD(i::TEXT, 13, '0'), true, 'Livro ' || i, 'Genero ' || ((i-1) % 10 + 1), 'Autor ' || ((i-1) % 1000 + 2001), ((i-1) % 1000 + 2001), ((i-1) % 100 + 1));
+    END LOOP;
+
+    
+    FOR i IN 1..1000 LOOP
+        INSERT INTO Emprestimo (data_emp, data_venc, status, cpf, cod_livro, cod_funcionario)
+        VALUES (current_date, current_date + interval '7 days', ((i-1) % 2), LPAD((i+1000)::TEXT, 3, '0') || '.' || LPAD((i % 100)::TEXT, 3, '0') || '.' || LPAD((i % 100)::TEXT, 3, '0') || '-00', i, ((i-1) % 1000 + 1));
+        
+        INSERT INTO Multa (valor, pago, cod_emp)
+        VALUES (i * 0.5, false, i);
+    END LOOP;
+END $$;
+
+
 --- Procedure para inserir livro/autor
 DO
 $do$
